@@ -4,7 +4,7 @@
     <router-view></router-view>
 
       <!-- 底部导航栏 -->
-    <div>
+    <div class="bottom-nav">
       <router-link to="/home">首页</router-link>
       <router-link to="/category">分类项</router-link>
       <router-link to="cart">购物车</router-link>
@@ -19,6 +19,26 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="less" scoped>
+.layout{
+  position: relative;
+  .bottom-nav{
+  display: flex;
+  width:100%;
+  position: fixed;
+  bottom: 0;
+  height: 50px;
+  background-color: #fff;
+  text-align: center;
+  align-items: center;
+  a{
+    color: black;
+    font-size: 12px;
+    flex:1;
+  }
+  .router-link-active {
+    color: red;
+  }
+}
+}
 </style>
