@@ -24,15 +24,27 @@
         <div class="icon-img">
           <img src="@/assets/nav1.png" alt="icon" />
         </div>
-          <span>新品首发</span>
+        <span>新品首发</span>
       </div>
+    </div>
+    <!-- 商品卡片 -->
+    <div class="youlike">
+      <p>—— 猜你喜欢 ——</p>
+    </div>
+    <!--  -->
+    <div class="goods-item">
+      <GoodsItem v-for="item in 8" :key="item"></GoodsItem>
     </div>
   </div>
 </template>
 
 <script>
+import GoodsItem from '@/components/GoodsItem.vue'
 export default {
-  name: 'myHome'
+  name: 'myHome',
+  components: {
+    GoodsItem
+  }
 
 }
 </script>
@@ -53,7 +65,7 @@ export default {
       margin-left: 20px;
     }
     .inp {
-      // width: 100%;
+      width: 100%;
       flex: 1;
       background-color: #f1f1f1;
       border: none;
@@ -104,6 +116,7 @@ export default {
     flex-wrap: wrap;
     justify-content: space-between;
     align-content: space-between;
+    background-color: #fff;
     .nav-list {
       width: 75px;
       height: 100px;
@@ -126,6 +139,22 @@ export default {
         }
       }
     }
+  }
+  .youlike {
+    margin: 12px 0;
+    display: flex;
+    justify-content: center;
+    p {
+      font-size: 14px;
+      color: #666;
+      font-weight: 400;
+    }
+  }
+  .goods-item{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: flex-start;
   }
 }
 </style>
