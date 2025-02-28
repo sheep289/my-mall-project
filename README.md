@@ -30,13 +30,7 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ## 2.配置vant(操作方式可以查看vant2文档) 然后使用组件库中的vm浏览器适配
 ```
-module.exports = {
-  plugins: {
-    'postcss-px-to-viewport': {
-      viewportWidth: 375
-    }
-  }
-}
+配置vant组件（按需导入） 步骤如图
 https://imgur.la/images/2025/02/28/-2025-02-28-013319.png
 ```
 ```
