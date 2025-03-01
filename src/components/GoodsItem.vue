@@ -50,12 +50,12 @@ export default {
     }
   }
   .goods-text {
-    white-space: nowrap;  //禁止换行
+    white-space: nowrap; //禁止换行
     font-size: 14px;
-    text-overflow: ellipsis;   //使用省略号表示溢出
+    text-overflow: ellipsis; //使用省略号表示溢出
     margin: 10px 0 10px 6px;
-    h3{
-        margin-bottom: 8px;
+    h3 {
+      margin-bottom: 8px;
     }
     .price-sing {
       font-size: 12px;
@@ -66,9 +66,9 @@ export default {
       color: red;
       margin-right: 4px;
     }
-    .sales{
-        font-size: 12px;
-        color: #999;
+    .sales {
+      font-size: 12px;
+      color: #999;
     }
   }
 }

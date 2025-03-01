@@ -3,7 +3,7 @@
     <!-- 搜索 -->
     <div class="search">
       <van-icon name="search" class="icon" />
-      <input type="text" class="inp" placeholder="搜索你要找的商品" />
+      <input type="text" class="inp" placeholder="搜索你要找的商品" @click="$router.push('/search')" />
     </div>
     <!-- 轮播图 -->
     <div class="swipe">
@@ -33,7 +33,7 @@
     </div>
     <!--  -->
     <div class="goods-item">
-      <GoodsItem v-for="item in 8" :key="item"></GoodsItem>
+      <GoodsItem v-for="item in 9" :key="item"></GoodsItem>
     </div>
   </div>
 </template>
@@ -53,7 +53,6 @@ export default {
 .home {
   // 搜索
   .search {
-    // border: 1px solid red;
     display: flex;
     background-color: #f1f1f2;
     border-radius: 25px;
@@ -153,8 +152,7 @@ export default {
   .goods-item{
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    align-content: flex-start;
+    justify-content: space-between;
   }
 }
 </style>
