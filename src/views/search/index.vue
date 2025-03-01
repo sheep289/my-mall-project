@@ -1,12 +1,9 @@
 <template>
   <div class="search">
     <!-- 顶部导航标题 -->
-    <div class="navBar">
-      <van-icon name="arrow-left" class="go" @click="$router.go(-1)" />
-      <div class="title">
-        <h3>商品搜索</h3>
-      </div>
-    </div>
+    <TopTitle>
+      <h3>商品搜索</h3>
+    </TopTitle>
     <!-- 搜索框  -->
     <div class="search-box">
       <van-icon name="search" class="icon" />
@@ -34,27 +31,17 @@
 </template>
 
 <script>
+import TopTitle from '@/components/TopTitle.vue'
 export default {
-  name: 'searchsIndex'
+  name: 'searchsIndex',
+  components: {
+    TopTitle
+  }
 }
 </script>
 
 <style lang="less" scoped>
 .search {
-  .navBar {
-    width: 100%;
-    height: 50px;
-    background-color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    .go {
-      position: absolute;
-      left: 12px;
-      font-size: 16px;
-    }
-  }
   .search-box {
     display: flex;
     background-color: #f1f1f2;
@@ -64,6 +51,7 @@ export default {
     overflow: hidden;
     align-items: center;
     position: relative;
+    justify-content: center;
     .icon {
       padding: 10px 0;
       margin-left: 20px;
@@ -111,7 +99,7 @@ export default {
       border: 1px solid #efefef;
       overflow: hidden;
       white-space: nowrap;
-      text-overflow: ellipsis;  //使用省略号表示溢出
+      text-overflow: ellipsis; //使用省略号表示溢出
       margin-bottom: 10px;
     }
   }
