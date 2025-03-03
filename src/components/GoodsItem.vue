@@ -3,7 +3,7 @@
     问题：此商品卡片复用性极高，后续很多地方都要用到此卡片，
     解决：将此功能创建为组件，提高复用性，简介代码
    -->
-  <div class="goods-item">
+  <div class="goods-item" @click="$router.push('/prodetail/1000')">
     <!-- 图片 -->
     <div class="goods-img">
       <img src="@/assets/product.jpg" alt="goods_img" />

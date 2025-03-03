@@ -1,3 +1,4 @@
 import Vue from 'vue'
-import { Icon } from 'vant'
+import { Rate, Icon } from 'vant'
+Vue.use(Rate)
 Vue.use(Icon)
