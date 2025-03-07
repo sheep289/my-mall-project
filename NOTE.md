@@ -31,3 +31,8 @@
       -webkit-box-orient: vertical; //设置盒子的排列方式
       -webkit-line-clamp: 2; //指定要显示的行数
       overflow: hidden;
+
+## 2025-3-4 css
+**问题：**商品没有选择规格这个功能
+**解决：** 后续搭配后端开发时添加此功能
+
