@@ -2,6 +2,7 @@
 node_modules
 /dist
 /NOTE.md
+index.json
 
 
 # local env files
