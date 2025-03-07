@@ -1,25 +1,53 @@
-.DS_Store
-node_modules
-/dist
-/NOTE.md
+# --- 依赖与构建产物 ---
+node_modules/
+dist/
+build/
+*.zip
+*.tar
+*.gz
+index.json
+NOTE.md/
 
 
-# local env files
+# --- 环境变量和敏感文件 ---
+.env
 .env.local
-.env.*.local
+.env.development
+.env.production
+.env.staging
+config/secret.js
+config/keys.js
+*.key
+*.pem
+*.cert
 
-# Log files
+# --- IDE/编辑器配置 ---
+.vscode/
+.idea/
+*.code-workspace
+*.sublime-project
+*.sublime-workspace
+
+# --- 本地调试文件 ---
+*.log
+logs/
+debug/
+temp/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
 
-# Editor directories and files
-.idea
-.vscode
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-*.log
+# --- 操作系统生成文件 ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+desktop.ini
+
+# --- 其他 ---
+*.local
+.cache/
+.versions
+.tern-project
