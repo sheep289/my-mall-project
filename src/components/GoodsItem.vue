@@ -3,20 +3,19 @@
     问题：此商品卡片复用性极高，后续很多地方都要用到此卡片，
     解决：将此功能创建为组件，提高复用性，简介代码
    -->
-  <div class="goods-item" @click="$router.push('/prodetail/1000')">
+  <div class="goods-item" @click="$router.push(`/prodetail/${item.id}`)">
     <!-- 图片 -->
     <div class="goods-img">
-      <img src="@/assets/product.jpg" alt="goods_img" />
+      <img :src="item.image[0]" alt="goods_img" />
     </div>
     <div class="goods-text">
       <h3>
-        三星手机 SAMSUNG Galaxy S23 8GB+256GB 超视觉夜拍系统 超清夜景 悠雾紫
-        5G手机 游戏拍照旗舰机s23
+       {{ item.title }}
       </h3>
       <p>
         <span class="price-sing" v-if="true">券后</span>
-        <strong class="price">￥9999<span class="price-sing">.00</span></strong>
-        <span class="sales">销量200万+</span>
+        <strong class="price">￥{{ item.price_min }}<span class="price-sing">.00</span></strong>
+        <span class="sales">销量{{ item.sales }}+</span>
       </p>
     </div>
   </div>
@@ -24,7 +23,12 @@
 
 <script>
 export default {
-  name: 'goodsItemIndex'
+  name: 'goodsItemIndex',
+  props: {
+    item: {
+      type: Object
+    }
+  }
 
 }
 </script>
@@ -38,7 +42,7 @@ export default {
   height: 240px;
   overflow: hidden;
   border-radius: 5px;
-  margin: 8px;
+  margin: 4px 8px;
   background-color: #fff;
   .goods-img {
     width: 168px;

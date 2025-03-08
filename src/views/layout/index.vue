@@ -24,6 +24,7 @@ export default {
   position: relative;
   .bottom-nav{
   display: flex;
+  z-index: 100;
   width:100%;
   position: fixed;
   bottom: 0;
