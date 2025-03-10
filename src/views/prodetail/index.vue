@@ -7,29 +7,21 @@
       </TopTitle>
     </div>
     <!-- 1.轮播图 -->
-    <div class="swipe">
-      <img src="@/assets/product.jpg" alt="swipe" class="swipe-img active" />
-      <img src="@/assets/product.jpg" alt="swipe" class="swipe-img" />
-      <img src="@/assets/product.jpg" alt="swipe" class="swipe-img" />
-      <img src="@/assets/product.jpg" alt="swipe" class="swipe-img" />
-      <!-- 图片页码 -->
-      <div class="page-num">1 / 4</div>
-    </div>
+  <GoodsSwiper :list="goodsSwiper"></GoodsSwiper>
     <!-- 2.商品信息 -->
     <div class="goods-message">
       <!-- 2.1价格 -->
       <div class="goods-price">
         <div class="price">
           <span class="small">券后</span>
-          <strong><span class="symbol">￥</span>9999.00</strong>
-          <del class="small">￥10000.00></del>
+          <strong><span class="symbol">￥</span>{{ goodsList.price_min }}</strong>
+          <del class="small">￥{{ goodsList.price_max }}</del>
         </div>
-        <div class="sold-out">已售 2483+</div>
+        <div class="sold-out">已售 {{ goodsList.sales }}+</div>
       </div>
       <!-- 2.2商品标题 -->
       <div class="goods-title">
-        三星手机 SAMSUNG Galaxy S23 8GB+256GB 超视觉夜拍系统 超清夜景 悠雾紫
-        5G手机 游戏拍照旗舰机s23
+        {{ goodsList.title }}
       </div>
       <!-- 2.3七天无理由 -->
       <div class="goods-gratuitous">
@@ -42,14 +34,14 @@
       </div>
       <!-- 2.4商品评价 -->
       <div class="goods-all-comment">
-        <span class="left">商品评价(400+)</span>
+        <span class="left">商品评价({{ goodsUserList.length }})</span>
         <div class="right">
           <span class="all">查看全部</span>
           <van-icon name="arrow" size="12px" color="#666" class="right-arrow" />
         </div>
       </div>
       <!-- 2.5展示2-4条用户评价 -->
-      <div class="goods-user-comment">
+      <div class="goods-user-comment" v-for="(item,index) in goodsUserList" :key="index.id">
         <!-- 头像
         用户的名字 默认是手机号 则需用 * 替换敏感词
          -->
@@ -58,18 +50,18 @@
             <img src="@/assets/default-avatar.png" alt="head-portrait" />
           </div>
           <div class="user-name">
-            <span>匿名玩家</span>
-            <van-rate value="3" color="#ffd21e" size="14px" class="star" />
+            <span>{{ item.user }}</span>
+            <van-rate :value="item.rating" color="#ffd21e" size="14px" class="star" />
           </div>
         </div>
         <!-- 评论内容 -->
         <div class="user-content">
           <p>
-            附件哦啊世界佛教奋斗设计费扫i非机动阿萨法叫哦附件哦啊世界佛教奋斗设计费扫i非机动阿萨法叫哦附件哦啊世界佛教奋斗设计费扫i非机动阿萨法叫哦
+           {{ item.content }}
           </p>
           <div class="comment-box">
-            <div class="comment-img" v-for="item in 6" :key="item">
-              <img src="@/assets/product.jpg" alt="comment-img" />
+            <div class="comment-img" v-for="item in item.user_comment_img" :key="item.id">
+              <img :src="item" alt="comment-img" />
             </div>
           </div>
         </div>
@@ -81,17 +73,17 @@
 
     <!-- 2.6商品详情  尺寸：宽度100%，高度自适应/建议高度 <= 1200px-->
     <div class="goods-detail-img">
-      <img src="@/assets/detail1.jpg" alt="" />
+      <img :src="goodsList.detail_img" alt="" />
     </div>
 
     <!-- 3.底部tab栏功能 -->
     <div class="bottom-tab-bar">
       <div class="home-bar">
-        <img src="@/assets/home.png" alt="home">
+        <img src="@/assets/home.png" alt="home" />
         <span>首页</span>
       </div>
       <div class="cart-bar">
-        <img src="@/assets/cart.png" alt="home">
+        <img src="@/assets/cart.png" alt="home" />
         <span>购物车</span>
       </div>
       <div class="add-cart">加入购物车</div>
@@ -102,49 +94,54 @@
 
 <script>
 import TopTitle from '@/components/TopTitle.vue'
+import GoodsSwiper from '@/components/GoodsSwiper.vue'
+import { getGoodsDeatil, getUserComment } from '@/api/prodetail'
 export default {
   name: 'prodetailIndex',
   components: {
-    TopTitle
+    TopTitle,
+    GoodsSwiper
+  },
+  data () {
+    return {
+      goodsList: {}, // 商品卡片数据
+      goodsSwiper: [],
+      goodsUserList: []
+    }
+  },
+  computed: {
+    id () {
+      return this.$route.params.id
+    }
+  },
+  created () {
+    this.getGoodsList()
+    this.getUserList()
+  },
+  methods: {
+    async getGoodsList () {
+      const res = await getGoodsDeatil(this.id)
+      this.goodsList = res
+      this.goodsSwiper = res.image
+    },
+    async getUserList () {
+      const res = await getUserComment(this.id)
+      this.goodsUserList = res
+      console.log(res)
+    }
   }
 }
 </script>
 
 <style lang="less" scoped>
 .prodetail {
+  padding-bottom: 80px;
   .top-title {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     z-index: 1000;
-  }
-  .swipe {
-    width: 100%;
-    height: 375px;
-    overflow: hidden;
-    position: relative;
-    .swipe-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: none;
-    }
-    .swipe-img.active {
-      display: block;
-    }
-    .page-num {
-      width: 15%;
-      padding: 4px 0;
-      background-color: rgba(168, 166, 166, 0.6);
-      border-radius: 50px;
-      text-align: center;
-      position: absolute;
-      right: 0;
-      top: 0;
-      margin: 12px 12px 0 0;
-      white-space: nowrap;
-    }
   }
   .goods-message {
     display: flex;
@@ -275,6 +272,7 @@ export default {
             img {
               height: 100%;
               width: 100%;
+              object-fit: cover;
               overflow: hidden;
             }
           }
@@ -295,23 +293,21 @@ export default {
     margin-top: 8px;
     border-top: 1px solid #d0c7c7;
     width: 100%;
-    border: 1px solid #000;
     height: auto;
-    img{
+    img {
       width: 100%;
       height: 100%;
     }
-
   }
 
   // 底部购物栏
-  .bottom-tab-bar{
+  .bottom-tab-bar {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
     height: 50px;
-    background-color:#fff;
+    background-color: #fff;
     display: flex;
     align-items: center;
     text-align: center;
@@ -320,30 +316,31 @@ export default {
     // padding: 8px 0;
     // justify-content: space-around;
     // text-align: center;
-    .home-bar,.cart-bar{
+    .home-bar,
+    .cart-bar {
       width: 50px;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       color: #000;
-      img{
+      img {
         width: 24px;
         height: 24px;
       }
     }
-    .add-cart{
+    .add-cart {
       width: 120px;
       border-radius: 20px;
       padding: 10px 0;
       margin: 0 4px;
       background-color: #ffa900;
     }
-    .buy-now{
+    .buy-now {
       flex: 2;
       padding: 10px 0;
       border-radius: 20px;
       background-color: #fe5630;
-      margin:0 12px 0 6px;
+      margin: 0 12px 0 6px;
     }
   }
 }

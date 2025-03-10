@@ -1,13 +1,5 @@
 <template>
   <div class="swipe">
-    <!-- <img
-      v-for="(item, index) in bannerList"
-      :key="index"
-      :src="item.url"
-      alt="banner"
-      class="swipe-img"
-      :class="{ active: activeIndex === index }"
-    /> -->
     <div class="swiper-slide" v-for="(item, index) in items" :key="index">
       <img
         :src="items[index]"
@@ -35,7 +27,6 @@ export default {
   },
   data () {
     return {
-      o: this.list,
       activeIndex: 0,
       timerId: null
     }
@@ -46,7 +37,7 @@ export default {
   },
   //   销毁定时器
   beforeDestroy () {
-    clearInterval(this.list)
+    clearInterval(this.timerId)
   },
   methods: {
     next () {
