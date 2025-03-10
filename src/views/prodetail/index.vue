@@ -78,35 +78,44 @@
 
     <!-- 3.底部tab栏功能 -->
     <div class="bottom-tab-bar">
-      <div class="home-bar">
+      <div class="home-bar" @click="$router.push('/')">
         <img src="@/assets/home.png" alt="home" />
         <span>首页</span>
       </div>
-      <div class="cart-bar">
+      <div class="cart-bar" @click="$router.push('/cart')">
         <img src="@/assets/cart.png" alt="home" />
         <span>购物车</span>
       </div>
-      <div class="add-cart">加入购物车</div>
-      <div class="buy-now">立即购买</div>
+      <div class="add-cart" @click="addFn">加入购物车</div>
+      <div class="buy-now" @click="buyFn">立即购买</div>
     </div>
+
+    <!-- 加入购物车的弹层 -->
+    <BottomPopup v-model="showPannel" :title="mode ==='add' ? '加入购物车' : '立即购买' ">
+    </BottomPopup>
   </div>
 </template>
 
 <script>
 import TopTitle from '@/components/TopTitle.vue'
 import GoodsSwiper from '@/components/GoodsSwiper.vue'
+import BottomPopup from '@/components/BottomPopup.vue'
 import { getGoodsDeatil, getUserComment } from '@/api/prodetail'
 export default {
   name: 'prodetailIndex',
   components: {
     TopTitle,
-    GoodsSwiper
+    GoodsSwiper,
+    BottomPopup
   },
   data () {
     return {
       goodsList: {}, // 商品卡片数据
-      goodsSwiper: [],
-      goodsUserList: []
+      goodsSwiper: [], // 存放商品轮播图
+      goodsUserList: [], // 存放商品评价
+      showPannel: false, // 控制底层显示
+      mode: 'add'
+
     }
   },
   computed: {
@@ -128,6 +137,14 @@ export default {
       const res = await getUserComment(this.id)
       this.goodsUserList = res
       console.log(res)
+    },
+    addFn () {
+      this.mode = 'add'
+      this.showPannel = true
+    },
+    buyFn () {
+      this.mode = 'buyNow'
+      this.showPannel = true
     }
   }
 }
