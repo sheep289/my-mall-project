@@ -11,3 +11,11 @@ export const getUserComment = (goodsId) => {
     }
   })
 }
+// 获取商品规格
+export const getSpecSelector = (id) => {
+  return request.get('http://localhost:3000/specSelector', {
+    params: {
+      id
+    }
+  })
+}

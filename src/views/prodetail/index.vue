@@ -7,14 +7,16 @@
       </TopTitle>
     </div>
     <!-- 1.轮播图 -->
-  <GoodsSwiper :list="goodsSwiper"></GoodsSwiper>
+    <GoodsSwiper :list="goodsSwiper"></GoodsSwiper>
     <!-- 2.商品信息 -->
     <div class="goods-message">
       <!-- 2.1价格 -->
       <div class="goods-price">
         <div class="price">
           <span class="small">券后</span>
-          <strong><span class="symbol">￥</span>{{ goodsList.price_min }}</strong>
+          <strong
+            ><span class="symbol">￥</span>{{ goodsList.price_min }}</strong
+          >
           <del class="small">￥{{ goodsList.price_max }}</del>
         </div>
         <div class="sold-out">已售 {{ goodsList.sales }}+</div>
@@ -41,7 +43,11 @@
         </div>
       </div>
       <!-- 2.5展示2-4条用户评价 -->
-      <div class="goods-user-comment" v-for="(item,index) in goodsUserList" :key="index.id">
+      <div
+        class="goods-user-comment"
+        v-for="(item, index) in goodsUserList"
+        :key="index.id"
+      >
         <!-- 头像
         用户的名字 默认是手机号 则需用 * 替换敏感词
          -->
@@ -51,16 +57,25 @@
           </div>
           <div class="user-name">
             <span>{{ item.user }}</span>
-            <van-rate :value="item.rating" color="#ffd21e" size="14px" class="star" />
+            <van-rate
+              :value="item.rating"
+              color="#ffd21e"
+              size="14px"
+              class="star"
+            />
           </div>
         </div>
         <!-- 评论内容 -->
         <div class="user-content">
           <p>
-           {{ item.content }}
+            {{ item.content }}
           </p>
           <div class="comment-box">
-            <div class="comment-img" v-for="item in item.user_comment_img" :key="item.id">
+            <div
+              class="comment-img"
+              v-for="item in item.user_comment_img"
+              :key="item.id"
+            >
               <img :src="item" alt="comment-img" />
             </div>
           </div>
@@ -90,8 +105,16 @@
       <div class="buy-now" @click="buyFn">立即购买</div>
     </div>
 
-    <!-- 加入购物车的弹层 -->
-    <BottomPopup v-model="showPannel" :title="mode ==='add' ? '加入购物车' : '立即购买' ">
+    <!-- 加入购物车的弹层
+    问题： 通过父传子，cartCard组件拿到数据后，图片渲染失败，原因：异步数据加载的延迟
+   解决： 使用v-if 控制弹层组件的渲染，确保数据加载完成后在显示
+     -->
+    <BottomPopup
+      v-model="showPannel"
+      :title="mode === 'add' ? '加入购物车' : '立即购买'"
+      v-if="specList.image && specList.image.length > 0 "
+      :list="specList"
+    >
     </BottomPopup>
   </div>
 </template>
@@ -100,7 +123,7 @@
 import TopTitle from '@/components/TopTitle.vue'
 import GoodsSwiper from '@/components/GoodsSwiper.vue'
 import BottomPopup from '@/components/BottomPopup.vue'
-import { getGoodsDeatil, getUserComment } from '@/api/prodetail'
+import { getGoodsDeatil, getUserComment, getSpecSelector } from '@/api/prodetail'
 export default {
   name: 'prodetailIndex',
   components: {
@@ -114,7 +137,8 @@ export default {
       goodsSwiper: [], // 存放商品轮播图
       goodsUserList: [], // 存放商品评价
       showPannel: false, // 控制底层显示
-      mode: 'add'
+      mode: 'add',
+      specList: {} // 存放商品规格数据
 
     }
   },
@@ -126,18 +150,27 @@ export default {
   created () {
     this.getGoodsList()
     this.getUserList()
+    this.getSpecList()
   },
   methods: {
+    // 获取商品数据
     async getGoodsList () {
       const res = await getGoodsDeatil(this.id)
       this.goodsList = res
       this.goodsSwiper = res.image
     },
+    // 获取用户评价数据
     async getUserList () {
       const res = await getUserComment(this.id)
       this.goodsUserList = res
-      console.log(res)
     },
+    // 获取商品规格数据
+    async getSpecList () {
+      const res = await getSpecSelector(this.id)
+      this.specList = res[0]
+      // console.log(this.specList)
+    },
+
     addFn () {
       this.mode = 'add'
       this.showPannel = true

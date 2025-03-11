@@ -17,11 +17,11 @@
         <div class="popup-body">
           <!-- 商品卡片 -->
           <div class="goods-card">
-            <CartCard></CartCard>
+            <CartCard :data="list"></CartCard>
           </div>
 
           <!-- 规格选择 -->
-          <SpecSelector></SpecSelector>
+          <SpecSelector :data="list.specs"></SpecSelector>
         </div>
 
         <div class="popup-bottom">
@@ -42,6 +42,10 @@ export default {
     CartCard,
     SpecSelector
   },
+  data () {
+    return {
+    }
+  },
   props: {
     value: {
       type: Boolean,
@@ -50,6 +54,10 @@ export default {
     title: {
       type: String,
       default: '提示'
+    },
+    list: {
+      type: Object,
+      default: () => {}
     }
 
   },
@@ -63,6 +71,7 @@ export default {
     value (newValue) {
       if (newValue) {
         document.body.style.overflow = 'hidden'
+        // console.log(this.list)
       } else {
         document.body.style.overflow = 'auto'
       }

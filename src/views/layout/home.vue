@@ -57,7 +57,7 @@ export default {
     this.bannerList = res.items[1].data_url
     this.navbarList = res.items[2].data
     this.goodsList = res.items[3].goods_data
-    console.log(this.bannerList)
+    // console.log(this.bannerList)
   }
 
 }

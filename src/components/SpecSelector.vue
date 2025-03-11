@@ -1,24 +1,49 @@
 <template>
   <!-- 规格选择组件 -->
   <div class="spec-selector">
-    <h5>颜色&nbsp; (4)</h5>
-    <div class="goods-color box">
-      <div class="color-item active" v-for="item in 5" :key="item">
-        <div class="color-img">
-          <img src="@/assets/2-1.png" alt="" />
+    <div v-for="item in data" :key="item.id">
+      <h5>
+        {{ item.name }}&nbsp;
+        <span v-if="item.values.length > 3">({{ item.values.length }})</span>
+      </h5>
+      <div class="spec-box">
+        <div
+          class="spec-item"
+          @click="addActive(index)"
+          v-for="(list, index) in item.values"
+          :key="index"
+          :class="{active: activeIndex === index}"
+        >
+          <div class="image-box" v-if="item.values_img">
+            <img :src="item.values_img[index]" alt="" />
+          </div>
+          <div class="text-box">
+            <p>{{ list }}</p>
+          </div>
         </div>
-        <span>卡其色</span>
       </div>
-    </div>
-    <h5>尺码</h5>
-    <div class="size-box box">
-      <div class="size active" v-for="item in 7" :key="item" >M</div>
     </div>
   </div>
 </template>
 
 <script>
 export default {
+  props: {
+    data: {
+      type: Array,
+      default: () => { }
+    }
+  },
+  data () {
+    return {
+      activeIndex: 0
+    }
+  },
+  methods: {
+    addActive (index) {
+      this.activeIndex = index
+    }
+  }
 
 }
 </script>
@@ -26,51 +51,48 @@ export default {
 <style lang="less" scoped>
 .spec-selector {
   padding: 8px 0;
-  .box {
+  .spec-box {
     padding: 8px 0;
     font-size: 12px;
     display: flex;
     flex-wrap: wrap;
     gap: 5%;
-  }
-  .goods-color {
-    .color-item {
+    .spec-item {
       background-color: #eee;
-      width: 30%;
+      width: 36%;
       height: 30px;
-      margin-bottom: 8px;
+      margin: 4px 0;
       display: flex;
       justify-content: space-around;
       align-items: center;
       border-radius: 4px;
-      .color-img {
-        padding: 2px 0;
-        width: 45%;
+      padding: 2px 0;
+      .image-box {
+        width: 35%;
         height: 100%;
+        flex: 0 0 auto; /* 图片盒子不伸缩 */
+        margin-right: 2px; /* 图片和文字之间的间距 */
         img {
           width: 100%;
           height: 100%;
           object-fit: cover;
         }
       }
+      .text-box {
+        flex: 1 1 auto; /* 文字盒子伸缩 */
+        text-align: center; /* 文字居中 */
+        font-size: 12px;
+        font-weight: 400;
+        padding: 0 6px;
+      }
     }
-    .color-item.active {
+    .spec-item.active {
       color: #ff5000;
       border: 1px solid #ff5000;
     }
-  }
-  .size-box {
-    .size {
-      text-align: center;
-      width: 14%;
-      height: 8%;
-      padding: 4px 0;
-      margin-bottom: 8px;
-      background-color: #eee;
-    }
-    .size.active {
-      color: #ff5000;
-      border: 1px solid #ff5000;
+    /* 当图片不存在时，调整容器的宽度 */
+    .spec-item:not(:has(.image-box)) {
+      width: fit-content; /* 宽度适应内容 */
     }
   }
 }

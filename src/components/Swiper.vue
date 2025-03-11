@@ -48,7 +48,6 @@ export default {
       this.timerId = setInterval(() => {
         this.next()
       }, 3000)
-      console.log(0)
     }
   }
 }
