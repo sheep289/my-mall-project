@@ -11,6 +11,14 @@
         }
   })
 
-  ## 获取商品详情数据  get / http://localhost:3000/goodsList
+## 获取商品详情数据  get / http://localhost:3000/goodsList
   - 演示
         return request.get(`http://localhost:3000/goodsList/${id}`)
+
+## 获取弹层数据  get  / http://localhost:3000/specSelector
+    -演示
+        return request.get('http://localhost:3000/specSelector', {
+        params: {
+        id
+        }
+    })
