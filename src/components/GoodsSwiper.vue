@@ -6,10 +6,10 @@
       :src="item"
       alt="swipe"
       class="swipe-img"
-      :class="{active:activeIndex === index }"
+      :class="{ active: activeIndex === index }"
     />
     <!-- 图片页码 -->
-    <div class="page-num">{{ activeIndex + 1 }} / 4</div>
+    <div class="page-num">{{ activeIndex + 1 }} / {{ list.length }}</div>
   </div>
 </template>
 
@@ -51,7 +51,7 @@ export default {
 
 <style lang="less" scoped>
 .swipe {
-    margin-top: 55px;
+  margin-top: 55px;
   width: 100%;
   height: 375px;
   overflow: hidden;

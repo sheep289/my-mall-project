@@ -27,7 +27,11 @@
     </div>
     <!--  -->
     <div class="goods-item">
-      <GoodsItem v-for="item in goodsList" :key="item.id" :item="item"></GoodsItem>
+      <GoodsItem
+        v-for="item in goodsList"
+        :key="item.id"
+        :item="item"
+      ></GoodsItem>
     </div>
   </div>
 </template>
@@ -70,55 +74,75 @@ export default {
   // 搜索
   .search {
     display: flex;
+    align-items: center;
     background-color: #f1f1f2;
     border-radius: 25px;
-    margin: 16px 14px 12px 14px;
-    overflow: hidden;
-    align-items: center;
+    margin: 16px 14px;
+    padding: 0 14px;
+    gap: 8px;
+
     .icon {
-      padding: 10px 0;
-      margin-left: 20px;
+      font-size: 18px;
+      color: #666;
+      flex-shrink: 0; //防止图标被压缩
     }
+
     .inp {
-      width: 100%;
       flex: 1;
-      background-color: #f1f1f1;
-      border: none;
-      margin-left: 10px;
+      min-height: 44px; //优化触摸区域
+      padding: 8px 0;
+      border: 0;
+      background: transparent; //继承父级背景
+      font-size: 14px;
+      outline: none;
+
+      // 移除点击高亮
+      -webkit-tap-highlight-color: transparent;
+
+      // 统一placeholder样式
+      &::placeholder {
+        color: #999;
+        font-weight: 300;
+      }
     }
   }
   // 导航栏
   .nav-bar {
     width: 100%;
-    height: auto;
     margin: 12px 0;
+    background-color: #fff;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    align-content: space-between;
-    background-color: #fff;
+
     .nav-list {
       width: 75px;
       margin: 8px;
       font-size: 14px;
-      font-weight: 400;
       color: #666;
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-content: flex-start;
+      flex-direction: column;
+      align-items: center;
+
       .icon-img {
         width: 40px;
         height: 40px;
         margin-bottom: 4px;
+
         img {
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: contain;
         }
       }
+      span {
+        text-align: center;
+        display: inline-block;
+        min-width: 40px;
+        line-height: 1.3;
+      }
     }
-  }
+    }
   .youlike {
     margin: 12px 0;
     display: flex;

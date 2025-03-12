@@ -35,43 +35,75 @@ export default {
 
 <style lang="less" scoped>
 .goods-item {
-  display: flex;
-  flex-direction: column; //y轴排列
-  justify-content: center;
-  width: 168px;
-  height: 240px;
+  flex: 1;
+  min-width: calc(50% - 8px); //确保一行两个，考虑间距
+  margin: 4px;
+  background: #fff;
+  border-radius: 8px;
   overflow: hidden;
-  border-radius: 5px;
-  margin: 4px 8px;
-  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease; // 添加点击反馈动画
+
+  &:active {
+    transform: scale(0.98); // 点击时的缩放反馈
+  }
+
   .goods-img {
-    width: 168px;
-    height: 168px;
+    position: relative;
+    width: 100%;
+    padding-top: 100%; // 保持1:1宽高比
+
     img {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
   }
+
   .goods-text {
-    white-space: nowrap; //禁止换行
-    font-size: 14px;
-    text-overflow: ellipsis; //使用省略号表示溢出
-    margin: 10px 0 10px 6px;
+    padding: 8px;
+
     h3 {
-      margin-bottom: 8px;
+      font-size: 13px;
+      line-height: 1.4;
+      color: #333;
+      margin: 0 0 6px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2; // 限制标题显示两行
+      -webkit-box-orient: vertical;
     }
+
+    p {
+      display: flex;
+      align-items: center;
+      margin: 0;
+    }
+
     .price-sing {
-      font-size: 12px;
-      color: red;
+      font-size: 10px;
+      color: #e02d29;
+      margin-right: 2px;
     }
+
     .price {
       font-size: 16px;
-      color: red;
-      margin-right: 4px;
+      color: #e02d29;
+      font-weight: 700;
+
+      span {
+        font-size: 12px;
+      }
     }
+
     .sales {
-      font-size: 12px;
+      flex: 1;
+      text-align: right;
+      font-size: 10px;
       color: #999;
     }
   }

@@ -20,7 +20,7 @@
     <!-- 最近搜索 -->
     <div class="history">
       <span>最近搜索</span>
-      <van-icon name="delete-o" />
+      <van-icon name="delete-o" class="del-icon" />
     </div>
     <div class="list">
       <div class="list-item" v-for="item in 10" :key="item">
@@ -47,18 +47,21 @@ export default {
     background-color: #f1f1f2;
     height: 40px;
     border-radius: 5px;
-    margin: 0px 14px 12px 14px;
+    margin: 60px 14px 12px 14px;
     overflow: hidden;
     align-items: center;
     position: relative;
     justify-content: center;
+
     .icon {
+      font-size: 16px;
       padding: 10px 0;
       margin-left: 20px;
     }
     .inp {
       width: 100%;
       flex: 1;
+      background-color: transparent; /* 改为透明 */
       background-color: #f1f1f1;
       border: none;
       margin-left: 10px;
@@ -66,14 +69,17 @@ export default {
     }
     .btn {
       width: 60px;
-      height: 40px;
+      height: 100%;
       background-color: #c21401;
-      position: absolute;
-      right: 0;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
       span {
         color: #fff;
         line-height: 40px;
+        font-size: 16px;
       }
     }
   }
@@ -81,6 +87,7 @@ export default {
     display: flex;
     justify-content: space-between;
     margin: 18px 12px;
+
   }
   .list {
     display: flex;

@@ -1,11 +1,9 @@
 <template>
   <div class="prodetail">
     <!-- 标题 -->
-    <div class="top-title">
-      <TopTitle>
-        <h3>商品详情页</h3>
-      </TopTitle>
-    </div>
+    <TopTitle>
+      <h3>商品详情页</h3>
+    </TopTitle>
     <!-- 1.轮播图 -->
     <GoodsSwiper :list="goodsSwiper"></GoodsSwiper>
     <!-- 2.商品信息 -->
@@ -112,7 +110,7 @@
     <BottomPopup
       v-model="showPannel"
       :title="mode === 'add' ? '加入购物车' : '立即购买'"
-      v-if="specList.image && specList.image.length > 0 "
+      v-if="specList.image && specList.image.length > 0"
       :list="specList"
     >
     </BottomPopup>
@@ -186,13 +184,6 @@ export default {
 <style lang="less" scoped>
 .prodetail {
   padding-bottom: 80px;
-  .top-title {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-  }
   .goods-message {
     display: flex;
     flex-direction: column;
@@ -341,7 +332,7 @@ export default {
   // 详情图
   .goods-detail-img {
     margin-top: 8px;
-    border-top: 1px solid #d0c7c7;
+    border-top: 1px solid #eee;
     width: 100%;
     height: auto;
     img {

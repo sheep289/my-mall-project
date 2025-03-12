@@ -1,7 +1,6 @@
 <template>
-  <!-- 规格选择组件 -->
   <div class="spec-selector">
-    <div v-for="item in data" :key="item.id">
+    <div v-for="(item, specIndex) in data" :key="specIndex">
       <h5>
         {{ item.name }}&nbsp;
         <span v-if="item.values.length > 3">({{ item.values.length }})</span>
@@ -9,16 +8,21 @@
       <div class="spec-box">
         <div
           class="spec-item"
-          @click="addActive(index)"
-          v-for="(list, index) in item.values"
+          @click="addActive(item.name, index)"
+          v-for="(value, index) in item.values"
           :key="index"
-          :class="{active: activeIndex === index}"
+          :class="{
+            active: activeIndices[item.name] === index,
+            'has-image': item.values_img
+          }"
         >
+          <!-- 图片容器（仅在存在values_img时显示） -->
           <div class="image-box" v-if="item.values_img">
-            <img :src="item.values_img[index]" alt="" />
+            <img :src="item.values_img[index]" alt="规格图片">
           </div>
+          <!-- 文字描述 -->
           <div class="text-box">
-            <p>{{ list }}</p>
+            <p>{{ value }}</p>
           </div>
         </div>
       </div>
@@ -31,68 +35,96 @@ export default {
   props: {
     data: {
       type: Array,
-      default: () => { }
+      default: () => []
     }
   },
   data () {
     return {
-      activeIndex: 0
+      activeIndices: {} // 使用对象存储激活状态，键为规格名称
     }
   },
+  created () {
+    // 初始化每个规格的默认选中状态（第一个选项）
+    this.activeIndices = this.data.reduce((acc, item) => {
+      this.$set(acc, item.name, 0)
+      return acc
+    }, {})
+  },
   methods: {
-    addActive (index) {
-      this.activeIndex = index
+    addActive (specName, index) {
+      // 使用Vue响应式方法更新状态
+      this.$set(this.activeIndices, specName, index)
+      console.log(this.activeIndices)
+    }
+  },
+  watch: {
+    // 监听数据变化重新初始化（适用于异步数据）
+    data: {
+      handler (newVal) {
+        newVal.forEach(item => {
+          if (!(item.name in this.activeIndices)) {
+            this.$set(this.activeIndices, item.name, 0)
+          }
+        })
+      },
+      immediate: true
     }
   }
-
 }
 </script>
 
 <style lang="less" scoped>
 .spec-selector {
   padding: 8px 0;
+
   .spec-box {
     padding: 8px 0;
-    font-size: 12px;
     display: flex;
     flex-wrap: wrap;
-    gap: 5%;
+    gap: 8px;
+
     .spec-item {
-      background-color: #eee;
-      width: 36%;
-      height: 30px;
-      margin: 4px 0;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
+      background: #f5f5f5;
       border-radius: 4px;
-      padding: 2px 0;
-      .image-box {
-        width: 35%;
-        height: 100%;
-        flex: 0 0 auto; /* 图片盒子不伸缩 */
-        margin-right: 2px; /* 图片和文字之间的间距 */
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
+      padding: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-width: 120px;
+      min-height: 40px;  // 添加最小高度保证垂直居中效果
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      // 带图片时的特殊样式
+      &.has-image {
+        justify-content: flex-start;
+        .image-box {
+          width: 40px;
+          height: 40px;
+          margin-right: 8px;
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
         }
       }
-      .text-box {
-        flex: 1 1 auto; /* 文字盒子伸缩 */
-        text-align: center; /* 文字居中 */
-        font-size: 12px;
-        font-weight: 400;
-        padding: 0 6px;
+
+      &.active {
+        border: 1px solid #ff5000;
+        color: #ff5000;
+        background: #fff9f6;
       }
-    }
-    .spec-item.active {
-      color: #ff5000;
-      border: 1px solid #ff5000;
-    }
-    /* 当图片不存在时，调整容器的宽度 */
-    .spec-item:not(:has(.image-box)) {
-      width: fit-content; /* 宽度适应内容 */
+
+      .text-box {
+        font-size: 12px;
+        white-space: nowrap;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
   }
 }
