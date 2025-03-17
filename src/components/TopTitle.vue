@@ -15,6 +15,7 @@ export default {}
 
 <style lang="less" scoped>
 .top-title {
+  margin-bottom: 50px;
   .navBar {
     width: 100%;
     height: 50px;
@@ -23,8 +24,6 @@ export default {}
     align-items: center;
     justify-content: center;
     position: relative;
-    box-sizing: border-box;
-
     position: fixed;
     top: 0;
     left: 0;

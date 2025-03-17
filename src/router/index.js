@@ -8,6 +8,7 @@ import Pay from '@/views/pay'
 import Search from '@/views/search'
 import Prodetail from '@/views/prodetail'
 import SearchList from '@/views/search/list.vue'
+import Register from '@/views/login/register.vue'
 
 // 二级路由
 import Home from '@/views/layout/home.vue'
@@ -33,6 +34,7 @@ const routes = [
     path: '/login',
     component: Login
   },
+  { path: '/register', component: Register },
   { path: '/myorder', component: Myorder },
   { path: '/pay', component: Pay },
   { path: '/search', component: Search },
