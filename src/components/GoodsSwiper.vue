@@ -56,6 +56,7 @@ export default {
   height: 375px;
   overflow: hidden;
   position: relative;
+  padding: 12px 0;
   .swipe-img {
     width: 100%;
     height: 100%;

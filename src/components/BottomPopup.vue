@@ -9,23 +9,19 @@
           <slot name="header">
             <h3>{{ title }}</h3>
             <div class="close-img" @click="close">
-              <img src="@/assets/close.png" alt="">
+              <img src="@/assets/close.png" alt="" />
             </div>
           </slot>
         </div>
 
         <div class="popup-body">
           <!-- 商品卡片 -->
-          <div class="goods-card">
-            <CartCard :data="list"></CartCard>
-          </div>
-
           <!-- 规格选择 -->
-          <SpecSelector :data="list.specs"></SpecSelector>
+          <SpecSelector ref="childRef"></SpecSelector>
         </div>
-
         <div class="popup-bottom">
-          <div class="btn">
+          <div class="btn" v-if="title === '加入购物车'" @click="addCart">{{ title }}</div>
+          <div class="btn" v-else :class="{ buy_now: title === '立即购买' }">
             {{ title }}
           </div>
         </div>
@@ -35,11 +31,10 @@
 </template>
 
 <script>
-import CartCard from '@/components/CartCard.vue'
+import { setAddCart } from '@/api/cart'
 import SpecSelector from '@/components/SpecSelector.vue'
 export default {
   components: {
-    CartCard,
     SpecSelector
   },
   data () {
@@ -54,16 +49,29 @@ export default {
     title: {
       type: String,
       default: '提示'
-    },
-    list: {
-      type: Object,
-      default: () => {}
     }
-
+  },
+  computed: {
+    goodsId () {
+      return this.$store.state.detail.detail.id
+    }
   },
   methods: {
     close () {
       this.$emit('input', false)
+    },
+    async addCart () {
+      try {
+        const param = this.$refs.childRef.getChildData()
+
+        // 发起添加到购物车而请求
+        const { data } = await setAddCart(this.goodsId, param.selectSpecsIds, param.count)
+        this.$store.commit('detail/getCartTotal', data.cart_total)
+        alert('加入购物车成功')
+        this.$emit('input', false)
+      } catch (error) {
+        console.log(error.message)
+      }
     }
   },
   //   记录
@@ -71,7 +79,6 @@ export default {
     value (newValue) {
       if (newValue) {
         document.body.style.overflow = 'hidden'
-        // console.log(this.list)
       } else {
         document.body.style.overflow = 'auto'
       }
@@ -115,12 +122,12 @@ export default {
       position: relative;
       padding-bottom: 15px;
       border-bottom: 1px solid #eee;
-      .close-img{
+      .close-img {
         width: 20px;
         height: 20px;
         position: absolute;
         right: 0;
-        img{
+        img {
           width: 100%;
           height: 100%;
         }
@@ -128,25 +135,25 @@ export default {
     }
     .popup-body {
       width: 100%;
-      margin-bottom: 28px;  //控制body与固定的bottom的距离
-      .goods-card{
-        border-bottom: 1px solid #eee;
-      }
+      margin-bottom: 28px; //控制body与固定的bottom的距离
     }
     .popup-bottom {
-       width: 100%;
+      width: 100%;
       text-align: center;
       color: #fff;
       position: fixed;
       bottom: 0;
       left: 0;
       padding: 12px;
-    }
-      .btn{
+      .btn {
         padding: 10px;
         border-radius: 5px;
         background-color: #ff9402;
+        &.buy_now {
+          background-color: #fe5630;
+        }
       }
+    }
   }
 }
 // 入场离场动画

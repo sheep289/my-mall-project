@@ -6,7 +6,7 @@
       <input
         type="text"
         class="inp"
-        :placeholder="searchList.placeholder"
+        placeholder="请搜索你要找的商品"
         @click="$router.push('/search')"
       />
     </div>
@@ -18,7 +18,7 @@
         <div class="icon-img">
           <img :src="item.icon_url" alt="icon" />
         </div>
-        <span>{{ item.text }}</span>
+        <span>{{ item.name }}</span>
       </div>
     </div>
     <!-- 商品卡片 -->
@@ -39,7 +39,7 @@
 <script>
 import GoodsItem from '@/components/GoodsItem.vue'
 import Swiper from '@/components/Swiper.vue'
-import { getHomData } from '@/api/home'
+import { getBannerData, getGoodsList, getNavData } from '@/api/home'
 export default {
   name: 'myHome',
   components: {
@@ -50,18 +50,29 @@ export default {
     return {
       searchList: '',
       bannerList: [],
-      navbarList: '',
-      goodsList: '',
+      navbarList: [],
+      goodsList: [],
       activeIndex: 0
     }
   },
   async created () {
-    const res = await getHomData()
-    this.searchList = res.items[0]
-    this.bannerList = res.items[1].data_url
-    this.navbarList = res.items[2].data
-    this.goodsList = res.items[3].goods_data
-    // console.log(this.bannerList)
+    this.bannerData()
+    this.navData()
+    this.goodsData()
+  },
+  methods: {
+    async bannerData () {
+      const res = await getBannerData()
+      this.bannerList = res.data_url
+    },
+    async navData () {
+      const res = await getNavData()
+      this.navbarList = res.data
+    },
+    async goodsData () {
+      const res = await getGoodsList()
+      this.goodsList = res.data
+    }
   }
 
 }

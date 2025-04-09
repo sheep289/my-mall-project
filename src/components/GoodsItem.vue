@@ -3,10 +3,10 @@
     问题：此商品卡片复用性极高，后续很多地方都要用到此卡片，
     解决：将此功能创建为组件，提高复用性，简介代码
    -->
-  <div class="goods-item" @click="$router.push(`/prodetail/${item.id}`)">
+  <div class="goods-item" @click="$router.push(`/prodetail/${item.goods_id}`)">
     <!-- 图片 -->
     <div class="goods-img">
-      <img :src="item.image[0]" alt="goods_img" />
+      <img :src="item.goods_cover_image" alt="goods_img" />
     </div>
     <div class="goods-text">
       <h3>
@@ -86,7 +86,7 @@ export default {
 
     .price-sing {
       font-size: 10px;
-      color: #e02d29;
+      color: #ff0400;
       margin-right: 2px;
     }
 

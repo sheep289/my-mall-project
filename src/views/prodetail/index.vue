@@ -5,7 +5,7 @@
       <h3>商品详情页</h3>
     </TopTitle>
     <!-- 1.轮播图 -->
-    <GoodsSwiper :list="goodsSwiper"></GoodsSwiper>
+    <GoodsSwiper :list="detail.detail_images"></GoodsSwiper>
     <!-- 2.商品信息 -->
     <div class="goods-message">
       <!-- 2.1价格 -->
@@ -13,15 +13,17 @@
         <div class="price">
           <span class="small">券后</span>
           <strong
-            ><span class="symbol">￥</span>{{ goodsList.price_min }}</strong
+            ><span class="price-sing">￥</span>{{ detail.price_min }}</strong
           >
-          <del class="small">￥{{ goodsList.price_max }}</del>
+          <del class="small">￥{{ detail.price_max }}</del>
         </div>
-        <div class="sold-out">已售 {{ goodsList.sales }}+</div>
+        <div class="sold-out">已售 {{ detail.sales }}+</div>
       </div>
       <!-- 2.2商品标题 -->
       <div class="goods-title">
-        {{ goodsList.title }}
+        <h3>
+          {{ detail.title }}
+        </h3>
       </div>
       <!-- 2.3七天无理由 -->
       <div class="goods-gratuitous">
@@ -29,7 +31,7 @@
         <div class="back" v-for="item in 2" :key="item">
           <img src="@/assets/select.png" alt="icon" class="gratuitous-icon" />
           <span>7天无理由退货 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;48小时发货</span>
-          <van-icon name="arrow" size="12px" color="#666" class="right-arrow" />
+          <van-icon name="arrow" color="#666" class="right-arrow" />
         </div>
       </div>
       <!-- 2.4商品评价 -->
@@ -37,28 +39,31 @@
         <span class="left">商品评价({{ goodsUserList.length }})</span>
         <div class="right">
           <span class="all">查看全部</span>
-          <van-icon name="arrow" size="12px" color="#666" class="right-arrow" />
+          <van-icon name="arrow" color="#666" class="right-arrow" />
         </div>
       </div>
       <!-- 2.5展示2-4条用户评价 -->
       <div
         class="goods-user-comment"
         v-for="(item, index) in goodsUserList"
-        :key="index.id"
+        :key="index"
       >
         <!-- 头像
         用户的名字 默认是手机号 则需用 * 替换敏感词
          -->
         <div class="user-message">
           <div class="user-img">
-            <img src="@/assets/default-avatar.png" alt="head-portrait" />
+            <img
+              :src="item.head_protrait || item.default_head_portrait"
+              alt="head-portrait"
+            />
           </div>
           <div class="user-name">
-            <span>{{ item.user }}</span>
+            <span>{{ item.nick_name || item.username }}</span>
             <van-rate
-              :value="item.rating"
+              :value="item.goods_rating"
               color="#ffd21e"
-              size="14px"
+              size="13px"
               class="star"
             />
           </div>
@@ -66,13 +71,13 @@
         <!-- 评论内容 -->
         <div class="user-content">
           <p>
-            {{ item.content }}
+            {{ item.goods_comment }}
           </p>
           <div class="comment-box">
             <div
               class="comment-img"
-              v-for="item in item.user_comment_img"
-              :key="item.id"
+              v-for="(item, index) in item.comment_images"
+              :key="index"
             >
               <img :src="item" alt="comment-img" />
             </div>
@@ -86,7 +91,7 @@
 
     <!-- 2.6商品详情  尺寸：宽度100%，高度自适应/建议高度 <= 1200px-->
     <div class="goods-detail-img">
-      <img :src="goodsList.detail_img" alt="" />
+      <img :src="detail.detail_page_images" alt="" />
     </div>
 
     <!-- 3.底部tab栏功能 -->
@@ -96,6 +101,7 @@
         <span>首页</span>
       </div>
       <div class="cart-bar" @click="$router.push('/cart')">
+        <span v-if="cartTotal > 0" class="num">{{ cartTotal }}</span>
         <img src="@/assets/cart.png" alt="home" />
         <span>购物车</span>
       </div>
@@ -109,9 +115,8 @@
      -->
     <BottomPopup
       v-model="showPannel"
+      v-if="detail.detail_images && detail.detail_images.length > 0"
       :title="mode === 'add' ? '加入购物车' : '立即购买'"
-      v-if="specList.image && specList.image.length > 0"
-      :list="specList"
     >
     </BottomPopup>
   </div>
@@ -121,7 +126,8 @@
 import TopTitle from '@/components/TopTitle.vue'
 import GoodsSwiper from '@/components/GoodsSwiper.vue'
 import BottomPopup from '@/components/BottomPopup.vue'
-import { getGoodsDeatil, getUserComment, getSpecSelector } from '@/api/prodetail'
+import { getUserComment } from '@/api/prodetail'
+import { mapState } from 'vuex'
 export default {
   name: 'prodetailIndex',
   components: {
@@ -131,42 +137,26 @@ export default {
   },
   data () {
     return {
-      goodsList: {}, // 商品卡片数据
-      goodsSwiper: [], // 存放商品轮播图
       goodsUserList: [], // 存放商品评价
       showPannel: false, // 控制底层显示
-      mode: 'add',
-      specList: {} // 存放商品规格数据
-
+      mode: 'add'
     }
   },
   computed: {
-    id () {
+    goodsId () {
       return this.$route.params.id
-    }
+    },
+    ...mapState('detail', ['detail', 'specs', 'cartTotal'])
   },
-  created () {
-    this.getGoodsList()
+  async created () {
+    await this.$store.dispatch('detail/getGoodsListAction', this.goodsId)
     this.getUserList()
-    this.getSpecList()
   },
   methods: {
-    // 获取商品数据
-    async getGoodsList () {
-      const res = await getGoodsDeatil(this.id)
-      this.goodsList = res
-      this.goodsSwiper = res.image
-    },
     // 获取用户评价数据
     async getUserList () {
-      const res = await getUserComment(this.id)
-      this.goodsUserList = res
-    },
-    // 获取商品规格数据
-    async getSpecList () {
-      const res = await getSpecSelector(this.id)
-      this.specList = res[0]
-      // console.log(this.specList)
+      const { data } = await getUserComment(this.goodsId)
+      this.goodsUserList = data
     },
 
     addFn () {
@@ -193,11 +183,11 @@ export default {
       display: flex;
       justify-content: space-between;
       .price {
-        color: #ff5000;
+        color: #ff0400;
         font-size: 18px;
         strong {
           margin: 0 2px;
-          .symbol {
+          .price-sing {
             font-size: 15px;
           }
         }
@@ -212,6 +202,7 @@ export default {
     }
     // 标题
     .goods-title {
+      font-size: 16px;
       width: 100%;
       margin-top: 8px;
       line-height: 1.5em;
@@ -236,6 +227,7 @@ export default {
           margin-right: 8px;
         }
         .right-arrow {
+          font-size: 12px;
           position: absolute;
           right: 0;
         }
@@ -256,6 +248,7 @@ export default {
         color: #666;
         .all {
           margin-right: 10px;
+          font-size: 14px;
         }
       }
     }
@@ -364,6 +357,19 @@ export default {
       flex-wrap: wrap;
       justify-content: center;
       color: #000;
+      position: relative;
+      .num {
+        z-index: 999;
+        position: absolute;
+        top: -2px;
+        right: 0;
+        min-width: 16px;
+        padding: 0 4px;
+        color: #fff;
+        text-align: center;
+        background-color: #ee0a24;
+        border-radius: 50%;
+      }
       img {
         width: 24px;
         height: 24px;

@@ -1,18 +1,18 @@
 <template>
   <div class="goods-card">
     <div class="goods-img">
-      <img :src="data.image[0]" alt="" />
+      <img :src="detail.detail_images[0]" alt="img" />
     </div>
 
     <div class="goods-content">
       <!-- <div class="goods-title">fjdlajfldakjfkldasjflasj</div> -->
 
       <div class="goods-price">
-        <small>券后￥</small><span>{{ data.price_min }}</span><span>|</span
-        ><small>优惠前￥{{ data.price_max }}</small>
+        <small>券后￥</small><span>{{ detail.price_min }}</span><span>|</span
+        ><small>优惠前￥{{ detail.price_max }}</small>
       </div>
       <!-- 库存 -->
-      <span class="store">库存 {{ data.goods_store }}</span>
+      <span class="store">库存 {{ detail.stock }}</span>
       <!-- 数量 -->
       <div class="count">
         <Count></Count>
@@ -23,15 +23,14 @@
 
 <script>
 import Count from '@/components/Count.vue'
+import { mapState } from 'vuex'
 export default {
+  name: 'CartCardIndex',
   components: {
     Count
   },
-  props: {
-    data: {
-      type: Object,
-      default: () => {}
-    }
+  computed: {
+    ...mapState('detail', ['detail'])
   },
   methods: {
   }

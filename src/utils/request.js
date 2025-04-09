@@ -4,7 +4,7 @@
 */
 import axios from 'axios'
 const instance = axios.create({
-  baseURL: 'http://localhost:3000/api/',
+  baseURL: 'http://localhost',
   timeout: 5000
 })
 
@@ -19,8 +19,13 @@ instance.interceptors.request.use(function (config) {
 // 添加响应拦截器
 instance.interceptors.response.use(function (response) {
   // 2xx 范围内的状态码都会触发该函数。
+  const res = response.data
+  if (res.status !== 0) {
+    // alert(res.message)
+    // 抛出异常
+  }
   // 对响应数据做点什么
-  return response.data
+  return res
 }, function (error) {
   // 超出 2xx 范围的状态码都会触发该函数。
   // 对响应错误做点什么

@@ -57,3 +57,37 @@
          2.文字盒子：text-box 使用 flex: 1 1 auto 来允许它根据内容伸缩
          3.动态调整宽度：当图片不存在时，使用 :not(:has(.image-box)) 选择器来调整容器的宽度为 fit-content，使其适应文字内容。
          4.文字居中：通过 text-align: center 使文字在盒子内居中。
+
+## 底层弹框 规格选择
+问题：当选择颜色或者内存等规格，上方的商品卡片内容也要随着变化
+
+
+---
+
+解决：
+```javaScript
+ selectedPriceAndStock () {
+      let maxPrice = 0
+      let maxStock = Infinity
+
+      this.specs.forEach(spec => {
+        const selectedIndex = this.activeIndex[spec.specs_id]
+        const selectedValue = spec.values[selectedIndex]
+
+        if (selectedValue) {
+          maxPrice = Math.max(maxPrice, selectedValue.price || 0)
+          // 库存取最小值（按木桶原理，以最低库存为准）
+          if (selectedValue.stock !== undefined) {
+            maxStock = Math.min(maxStock, selectedValue.stock)
+          }
+        }
+      })
+
+      // 保留原始数据的兜底值
+      return {
+        price: maxPrice || this.detail.price_max,
+        stock: Number.isFinite(maxStock) ? maxStock : this.detail.stock
+      }
+    }
+
+```

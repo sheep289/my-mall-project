@@ -10,17 +10,21 @@
         <div class="form-item">
           <input
             type="text"
-            placeholder="请输入用户名/手机号"
+            placeholder="请输入手机号"
+            maxlength="11"
             class="input-field"
-            v-model="form.username"
+            v-model="username"
+            required
           />
         </div>
         <div class="form-item">
           <input
             type="password"
             placeholder="请输入密码"
+            minlength="6"
             class="input-field"
-            v-model="form.password"
+            v-model="password"
+            required
           />
         </div>
         <button class="submit-btn">登录</button>
@@ -34,25 +38,57 @@
 
 <script>
 import TopTitle from '@/components/TopTitle.vue'
+import { setLogin } from '@/api/register'
 export default {
   components: {
     TopTitle
   },
   data () {
     return {
-      form: {
-        username: '',
-        password: ''
+      username: '',
+      password: ''
+    }
+  },
+  created () {
+  },
+  computed: {
+    verify () {
+      if (!/^1[3-9]\d{9}$/.test(this.username)) {
+        alert('请输入正确的手机号')
+        return false
       }
+      if (!/^[\S]{6,12}$/.test(this.password)) {
+        alert('密码长度为6~12位')
+        return false
+      }
+      return true
     }
   },
   methods: {
-    handleSubmit () {
-      // 后续添加提交逻辑
+    // 校验手机号与密码
+    async handleSubmit () {
+      try {
+        if (this.verify) {
+          // 发起登录请求
+          const res = await setLogin(this.username, this.password)
+          // 将用户token权证存储到vuex中
+          this.$store.commit('user/setUserInfo', res.data)
+
+          alert('登录成功')
+          // 跳转到首页
+          this.$router.push('/')
+        }
+      } catch (error) {
+        alert(error.message)
+        console.log(error.message)
+      }
     },
     goRegister () {
       this.$router.push('/register')
     }
+  },
+  watch: {
+
   }
 }
 </script>
