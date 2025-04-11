@@ -12,3 +12,11 @@ export const setAddCart = (goodsId, specValueIds, quantity) => {
     }
   })
 }
+// 获取购物车列表数据
+export const getCartList = () => {
+  return request.get('/my/cart/list', {
+    headers: {
+      Authorization: store.getters.getToken
+    }
+  })
+}

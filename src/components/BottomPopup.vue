@@ -62,6 +62,7 @@ export default {
     },
     async addCart () {
       try {
+        // 判断是否有token 如果没有则弹出模态框
         const param = this.$refs.childRef.getChildData()
 
         // 发起添加到购物车而请求

@@ -3,7 +3,7 @@
     <!-- 1.头部标题与搜索框 -->
     <div class="cart-top">
       <h3>购物车</h3>
-      <span>(7)</span>
+      <span>({{ cartList.length }})</span>
       <!-- 搜索 -->
       <div class="cart-top-search">
         <van-icon name="search" class="icon" />
@@ -15,35 +15,50 @@
           value="手机"
         />
       </div>
-      <div class="cart-top-manage">管理</div>
+      <div class="cart-top-manage" @click="isEdit = !isEdit">管理</div>
     </div>
 
     <!-- 2.主体区域 -->
     <div class="container">
       <!-- 购物车卡片 -->
-      <div class="cart-item" v-for="item in 2" :key="item">
+      <div class="cart-item" v-for="(item, index) in cartList" :key="index">
         <!-- 复选框 -->
         <div class="goods-checked">
-          <input type="checkbox" class="checkBox" />
+          <input
+            type="checkbox"
+            class="checkBox"
+            v-model="item.isChecked"
+          />
         </div>
 
         <!-- 商品图片 -->
         <div class="goods-img">
-          <img src="@/assets/categood.png" alt="cart-img" />
+          <img :src="item.color_image || item.goods_coverImg" alt="cart-img" />
         </div>
 
         <!-- 商品内容 -->
         <div class="goods-content">
           <div class="goods-title">
             <p>
-              三星手机 SAMSUNG Galaxy S23 8GB+256GB 超视觉夜拍系统 超清夜景
-              悠雾紫 5G手机 游戏拍照旗舰机s23
+              {{ item.goods_title }}
             </p>
+          </div>
+          <div class="goods-specs">
+            {{ item.color_name }} ; {{ item.memory_name }}
           </div>
           <div class="price">
             <!-- <span class="small">券后</span> -->
-            <strong><span class="symbol">￥</span>9999.00</strong>
+            <strong><span class="symbol">￥</span>{{ item.price }}</strong>
             <!-- <del class="small">￥10000.00></del> -->
+          </div>
+        </div>
+        <!-- 商品数量 -->
+        <div class="goods-count">
+          <div class="count" v-if="countIsEdit" @click="handleCount">×{{ item.quantity }}</div>
+          <div class="change-count" v-else>
+            <button>-</button>
+            <input type="text" value="10" />
+            <button>+</button>
           </div>
         </div>
       </div>
@@ -51,23 +66,50 @@
 
     <!-- 底部结算 -->
     <div class="goPay-box">
-        <div class="all-checked">
-          <input type="checkbox">
-          全选
-        </div>
-        <div class="all-price">
-          合计：￥<span>88888.00</span>
-        </div>
-        <div class="goPay-btn">
-            结算(9)
-        </div>
+      <div class="all-checked">
+        <input type="checkbox" v-model="isAllSelect" />
+        全选
+      </div>
+      <div class="all-price">合计：￥<span>{{ selTotalPrice }}</span></div>
+      <div class="goPay-btn" v-if="isEdit" :class="{active: getSelCartCount === 0}">结算({{ getSelCartCount }})</div>
+      <div class="delete-btn" v-else :class="{active: getSelCartCount === 0}">删除</div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex'
 export default {
-  name: 'myCart'
+  name: 'myCart',
+  data () {
+    return {
+      isEdit: true,
+      countIsEdit: true
+    }
+  },
+  created () {
+    // 判断是否有token权证，有token权证才渲染购物车
+    if (this.$store.getters.getToken) {
+      this.$store.dispatch('cart/getCartListAction')
+    }
+  },
+  computed: {
+    ...mapState('cart', ['cartList']),
+    ...mapGetters('cart', ['getSelCartCount', 'selTotalPrice']),
+    isAllSelect: {
+      get () {
+        return this.cartList.every(item => item.isChecked)
+      },
+      set (newVal) {
+        this.$store.commit('cart/toggleCheck', newVal)
+      }
+    }
+  },
+  methods: {
+    handleCount () {
+      this.countIsEdit = !this.countIsEdit
+    }
+  }
 
 }
 </script>
@@ -128,44 +170,58 @@ export default {
   .container {
     display: flex;
     flex-direction: column;
-    margin-top: 50px;
+    margin: 50px 0 100px 0;
     .cart-item {
       width: 100%;
       padding: 12px;
       display: flex;
-      justify-content: space-between;
+      justify-content: space-around;
       background-color: #fff;
       text-align: left;
-      align-items: center;
-      margin-bottom: 12px;      .goods-checked {
+      margin-bottom: 12px;
+      .goods-checked {
+        display: flex;
+        align-items: center;
         .checkBox {
+          width: 14px;
+          height: 14px;
+          margin-right: 4px;
         }
       }
       .goods-img {
-        width: 100px;
+        width: 80px;
         height: 100px;
         img {
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: fill;
         }
       }
       .goods-content {
-        display: flex;
-        flex-wrap: wrap;
         width: 220px;
+        padding: 6px;
+        .goods-title,
+        .goods-specs,
+        .price {
+          margin-bottom: 10px;
+        }
         .goods-title {
           font-size: 14px;
           color: #000;
-          line-height: 1.5em;
           font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
             Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
             sans-serifd;
           display: -webkit-box; //设置元素为弹性盒子
           -webkit-box-orient: vertical; //设置盒子的排列方式
-          -webkit-line-clamp: 2; //指定要显示的行数
+          -webkit-line-clamp: 1; //指定要显示的行数
           overflow: hidden;
-          margin-bottom: 20px;
+        }
+        .goods-specs {
+          padding: 0 4px;
+          font-size: 12px;
+          color: #929292;
+          width: fit-content;
+          background-color: rgba(168, 166, 166, 0.1);
         }
         .price {
           font-size: 16px;
@@ -175,9 +231,39 @@ export default {
           }
         }
       }
+      .goods-count {
+        padding: 6px 0;
+        width: fit-content;
+        font-size: 12px;
+        text-align: center;
+        .count {
+          padding: 4px;
+
+          color: #000;
+          background-color: rgba(168, 166, 166, 0.1);
+          width: fit-content;
+        }
+        .change-count {
+          display: flex;
+          height: 20px;
+          gap: 2px;
+          button {
+            width: 20px;
+            height: 100%;
+            border: none;
+            background-color: rgba(168, 166, 166, 0.1);
+          }
+          input {
+            width: 30px;
+            text-align: center;
+            border: none;
+            background-color: rgba(168, 166, 166, 0.1);
+          }
+        }
+      }
     }
   }
-  .goPay-box{
+  .goPay-box {
     padding: 0 12px;
     width: 100%;
     height: 50px;
@@ -190,18 +276,18 @@ export default {
     justify-content: space-between;
     align-items: center;
 
-    .all-checked{
+    .all-checked {
       flex: 1;
     }
-    .all-price{
+    .all-price {
       font-size: 14px;
-      span{
+      span {
         color: #ff5000;
         font-size: 18px;
         margin-right: 12px;
       }
     }
-    .goPay-btn{
+    .goPay-btn,.delete-btn {
       width: 30%;
       height: 36px;
       line-height: 36px;
@@ -211,9 +297,10 @@ export default {
       font-size: 16px;
       color: #fff;
       // padding: 8px 22px;
-
+      &.active{
+        background-color: #ff9779;
+      }
     }
-
   }
 }
 </style>

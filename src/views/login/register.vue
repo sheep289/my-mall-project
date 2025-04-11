@@ -83,7 +83,7 @@ export default {
       },
       isCounting: false,
       codeBtnText: '获取验证码',
-      timerId: null,
+      timerId: null, // 存储定时器
       totalSeconds: 60, // 总秒速
       seconds: 60 // 倒计时秒速
     }
@@ -138,6 +138,10 @@ export default {
     goLogin () {
       this.$router.replace('/login')
     }
+  },
+  destroyed () {
+    // 销毁定时器
+    clearInterval(this.timerId)
   }
 }
 </script>
