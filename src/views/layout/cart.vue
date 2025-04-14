@@ -15,87 +15,117 @@
           value="手机"
         />
       </div>
-      <div class="cart-top-manage" @click="isEdit = !isEdit">管理</div>
+      <div class="cart-top-manage" @click="isEdit = !isEdit">
+        {{ isEdit ? "管理" : "退出管理" }}
+      </div>
     </div>
 
-    <!-- 2.主体区域 -->
-    <div class="container">
-      <!-- 购物车卡片 -->
-      <div class="cart-item" v-for="(item, index) in cartList" :key="index">
-        <!-- 复选框 -->
-        <div class="goods-checked">
-          <input
-            type="checkbox"
-            class="checkBox"
-            v-model="item.isChecked"
-          />
-        </div>
+    <div v-if="cartList.length > 0 && getToken">
+      <!-- 2.购物车主体区域 -->
+      <div class="container">
+        <!-- 购物车卡片 -->
+        <div class="cart-item" v-for="(item, index) in cartList" :key="index">
+          <!-- 复选框 -->
+          <div class="goods-checked">
+            <input type="checkbox" class="checkBox" v-model="item.isChecked" />
+          </div>
 
-        <!-- 商品图片 -->
-        <div class="goods-img">
-          <img :src="item.color_image || item.goods_coverImg" alt="cart-img" />
-        </div>
+          <!-- 商品图片 -->
+          <div class="goods-img">
+            <img
+              :src="item.color_image || item.goods_coverImg"
+              alt="cart-img"
+            />
+          </div>
 
-        <!-- 商品内容 -->
-        <div class="goods-content">
-          <div class="goods-title">
-            <p>
-              {{ item.goods_title }}
-            </p>
-          </div>
-          <div class="goods-specs">
-            {{ item.color_name }} ; {{ item.memory_name }}
-          </div>
-          <div class="price">
-            <!-- <span class="small">券后</span> -->
-            <strong><span class="symbol">￥</span>{{ item.price }}</strong>
-            <!-- <del class="small">￥10000.00></del> -->
+          <!-- 商品内容 -->
+          <div class="goods-content">
+            <div class="goods-title">
+              <p>
+                {{ item.goods_title }}
+              </p>
+            </div>
+            <div class="goods-specs">
+              {{ item.color_name }} ; {{ item.memory_name }}
+            </div>
+            <div class="price_add_count">
+              <div class="price">
+                <!-- <span class="small">券后</span> -->
+                <strong><span class="symbol">￥</span>{{ item.price }}</strong>
+                <!-- <del class="small">￥10000.00></del> -->
+              </div>
+              <!-- 商品数量 -->
+              <div class="count">
+                <Count
+                  :value="item.quantity"
+                  @input="(value) => changeCount(value, item.cart_id)"
+                ></Count>
+              </div>
+            </div>
           </div>
         </div>
-        <!-- 商品数量 -->
-        <div class="goods-count">
-          <div class="count" v-if="countIsEdit" @click="handleCount">×{{ item.quantity }}</div>
-          <div class="change-count" v-else>
-            <button>-</button>
-            <input type="text" value="10" />
-            <button>+</button>
-          </div>
+      </div>
+      <!-- 底部结算 -->
+      <div class="goPay-box">
+        <div class="all-checked">
+          <input type="checkbox" v-model="isAllSelect" />
+          全选
+        </div>
+        <div class="all-price" v-show="isEdit">
+          合计：￥<span>{{ selTotalPrice }}</span>
+        </div>
+        <div
+          class="goPay-btn"
+          v-if="isEdit"
+          :class="{ active: getSelCartCount === 0 }"
+        >
+          结算({{ getSelCartCount }})
+        </div>
+        <div
+          class="delete-btn"
+          v-else
+          :class="{ active: getSelCartCount === 0 }"
+          @click="clearHandle"
+        >
+          删除
         </div>
       </div>
     </div>
 
-    <!-- 底部结算 -->
-    <div class="goPay-box">
-      <div class="all-checked">
-        <input type="checkbox" v-model="isAllSelect" />
-        全选
-      </div>
-      <div class="all-price">合计：￥<span>{{ selTotalPrice }}</span></div>
-      <div class="goPay-btn" v-if="isEdit" :class="{active: getSelCartCount === 0}">结算({{ getSelCartCount }})</div>
-      <div class="delete-btn" v-else :class="{active: getSelCartCount === 0}">删除</div>
+    <!-- 购物车为空或者没有登录 -->
+    <div class="cart-null" v-else>
+      <img src="@/assets/cart_null.png" alt="" />
+      <div class="text">你的购物车是空的，快去逛逛吧</div>
+      <div class="btn" @click="$router.push('/home')">去逛逛</div>
     </div>
   </div>
 </template>
 
 <script>
 import { mapState, mapGetters } from 'vuex'
+import Count from '@/components/Count.vue'
 export default {
   name: 'myCart',
+  components: {
+    Count
+  },
   data () {
     return {
-      isEdit: true,
-      countIsEdit: true
+      isEdit: true
     }
   },
   created () {
     // 判断是否有token权证，有token权证才渲染购物车
-    if (this.$store.getters.getToken) {
+    if (this.getToken) {
       this.$store.dispatch('cart/getCartListAction')
     }
   },
   computed: {
+    getToken () {
+      return this.$store.getters.getToken
+    },
     ...mapState('cart', ['cartList']),
-    ...mapGetters('cart', ['getSelCartCount', 'selTotalPrice']),
+    ...mapGetters('cart', ['filterSelCart', 'getSelCartCount', 'selTotalPrice']),
     isAllSelect: {
       get () {
         return this.cartList.every(item => item.isChecked)
@@ -106,8 +136,15 @@ export default {
     }
   },
   methods: {
-    handleCount () {
-      this.countIsEdit = !this.countIsEdit
+    changeCount (value, cartId) {
+      this.$store.dispatch('cart/updateCountAction', { cartId, value })
+    },
+    clearHandle () {
+      // 如果选择的商品小于等于0则退出
+      if (this.filterSelCart.length <= 0) return
+      const cartIds = this.filterSelCart.map(item => item.cart_id)
+      this.$store.dispatch('cart/clearCartListAction', cartIds)
+      this.isEdit = true
     }
   }
 
@@ -201,8 +238,7 @@ export default {
         width: 220px;
         padding: 6px;
         .goods-title,
-        .goods-specs,
-        .price {
+        .goods-specs {
           margin-bottom: 10px;
         }
         .goods-title {
@@ -223,44 +259,50 @@ export default {
           width: fit-content;
           background-color: rgba(168, 166, 166, 0.1);
         }
-        .price {
-          font-size: 16px;
-          color: #ff5000;
-          .symbol {
-            font-size: 12px;
-          }
-        }
-      }
-      .goods-count {
-        padding: 6px 0;
-        width: fit-content;
-        font-size: 12px;
-        text-align: center;
-        .count {
-          padding: 4px;
 
-          color: #000;
-          background-color: rgba(168, 166, 166, 0.1);
-          width: fit-content;
-        }
-        .change-count {
+        .price_add_count {
           display: flex;
-          height: 20px;
-          gap: 2px;
-          button {
-            width: 20px;
-            height: 100%;
-            border: none;
-            background-color: rgba(168, 166, 166, 0.1);
+          justify-content: space-between;
+          align-items: center;
+          .price {
+            font-size: 16px;
+            color: #ff5000;
+            .symbol {
+              font-size: 12px;
+            }
           }
-          input {
-            width: 30px;
-            text-align: center;
-            border: none;
-            background-color: rgba(168, 166, 166, 0.1);
+          .count {
+            transform: scale(0.6); //将此盒子缩小
+            transform-origin: right; //指定缩放的基点
           }
         }
       }
+    }
+  }
+
+  // 空购物车
+  .cart-null {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 140px;
+    img {
+      width: 100px;
+    }
+    .text {
+      color: #666666;
+      font-size: 16px;
+      padding: 24px 0;
+    }
+    .btn {
+      width: 124px;
+      height: 38px;
+      line-height: 38px;
+      border-radius: 20px;
+      background-color: #fa2c20;
+      text-align: center;
+      color: #fff;
     }
   }
   .goPay-box {
@@ -287,7 +329,8 @@ export default {
         margin-right: 12px;
       }
     }
-    .goPay-btn,.delete-btn {
+    .goPay-btn,
+    .delete-btn {
       width: 30%;
       height: 36px;
       line-height: 36px;
@@ -297,7 +340,7 @@ export default {
       font-size: 16px;
       color: #fff;
       // padding: 8px 22px;
-      &.active{
+      &.active {
         background-color: #ff9779;
       }
     }

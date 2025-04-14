@@ -1,4 +1,4 @@
-import { getCartList } from '@/api/cart'
+import { getCartList, setUpdateCount, deleteCartList } from '@/api/cart'
 export default {
   namespaced: true,
   state () {
@@ -14,6 +14,10 @@ export default {
       state.cartList.forEach(item => {
         item.isChecked = bl
       })
+    },
+    updateCount (state, { cartId, value }) {
+      const goods = state.cartList.find(item => item.cart_id === cartId)
+      goods.quantity = value
     }
   },
   actions: {
@@ -24,6 +28,19 @@ export default {
         item.isChecked = false
       })
       context.commit('setCartList', data)
+    },
+    async updateCountAction (context, { cartId, value }) {
+      // 1.更新cartlist中的quantity数量，2.在发起请i去更新数据库数据
+      context.commit('updateCount', { cartId, value })
+
+      // 2.更新后台数据
+      await setUpdateCount(cartId, value)
+    },
+    async clearCartListAction (context, cartIds) {
+      await deleteCartList(cartIds)
+      alert('删除成功')
+      // 再次调用请求商品数据的接口 重新更新渲染商品列表
+      context.dispatch('getCartListAction')
     }
   },
   getters: {

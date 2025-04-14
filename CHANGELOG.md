@@ -140,7 +140,7 @@ c:\Users\28904\Pictures\Screenshots\屏幕截图 2025-02-28 015607.png
 - 1 封装api请求 （api/cart 需要在请求头中携带token权证
 - 2 在vuex（store/modules）中新建cart模块中发起请求，然后存储到vuex中，实现数据共享
 - 3 .拿到数据否对数据进行渲染
-
+    判断请求回来的购物车数据是否为空 并且 是否登录（token），如果其中一项不满足则显示空空如也
 -4渲染后 完成复选框功能，结算时的数量以及总价格都跟复选框有关联
   方案一：后端传过来的数据中有复选框是否选中状态
   方案二：如果没有，则自己添加复选框是否选中状态属性
@@ -149,8 +149,33 @@ c:\Users\28904\Pictures\Screenshots\屏幕截图 2025-02-28 015607.png
  
           4.2 复选框添加v-model指令 值为item.isChecked(手动添加的选中状态)
           4.3 计算属性中定义方法   
-              过滤商品是否选中(利用filter 筛选出选中的商品项 返回一个数组 ，后续的价格计算以及商品计算都是根据此计算属性来进行遍历)
-      获取选中商品的总数量
-      获取选中的总价格
+              过滤商品是否选中(利用filter 筛选出选中的商品项 返回一个数组 ，后续的价格              计算以及商品计算都是根据此计算属性来进行遍历)
+              获取选中商品的总数量
+              获取选中的总价格
           4. 全选功能 
+            利用计算属性的完整写法：
+            isAllSelect: {
+                get () {
+                return this.cartList.every(item => item.isChecked)
+              },
+              set (newVal) {
+                this.$store.commit('cart/toggleCheck', newVal)
+              }
+            }
+            get:
               利用数组的every方法 查询所有isChecked元素是否都为true,都通过则返回true，有一个假则返回true
+            set: newVal可以拿到布尔值，也就是是否全选，在调用vuex中的toggleCheck方法修改cartList里面的全部状态
+
+            5.导入数量计件组件：
+                注意：由于这里的需要修改的数量是vuex中的数据所以不能直接修改（不能直接使用v-model），应该拆分使用（也就是v-model底层原理，:value 与@input组合）
+                     复选框与数字框都不能用v-model来绑定 只能用：value单向绑定  因为不能直接去修改vuex里面的数据
+                  既希望保留原本的形参（@input 可以拿到当前输入框的值 )，有需要通过调佣函数传参 => 箭头函数包装一层
+              5.2当页面的数量发生变化时，数据也要随着发生变化：一是vuex里面的quantity。二是后端的数据（需要发起更新请求）调用请求接口，传入cartId与修改数量
+            
+            6.删除购物车商品共能
+            封装请求删除接口api 传入对应的cartIds值 为对象
+            拿到vuex/cart模块中 filterSelCart 计算后的数组（选中的商品），调用map方法拿到cartId 返回一个数组，数组中每一项是选中的cartId
+            vuex/cart 中发起删除请求，调用删除请求api，传入值
+             最后:
+                   // 再次调用请求商品数据的接口 重新更新渲染商品列表
+                   context.dispatch('getCartListAction')

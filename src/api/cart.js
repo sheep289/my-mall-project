@@ -20,3 +20,26 @@ export const getCartList = () => {
     }
   })
 }
+
+// 更新购物车商品数量
+export const setUpdateCount = (cartId, quantity) => {
+  return request.post('/my/cart/update', {
+    cartId,
+    quantity
+  }, {
+    headers: {
+      Authorization: store.getters.getToken
+    }
+  })
+}
+
+// 删除购物车商品
+export const deleteCartList = (cartIds) => {
+  return request.post('/my/cart/clear', {
+    cartIds
+  }, {
+    headers: {
+      Authorization: store.getters.getToken
+    }
+  })
+}
