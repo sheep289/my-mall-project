@@ -75,8 +75,14 @@ export default {
           this.$store.commit('user/setUserInfo', res.data)
 
           alert('登录成功')
-          // 跳转到首页
-          this.$router.push('/')
+          /*
+          如果是其它页面跳转到登录页面，则登录成功后，进行回跳
+          这里不能用push进行跳转，因为返回上一步时，又会跳到登录页面，
+          所以用replace替代push ,  replace在这的作用是进行页面替换，相当于从详情页跳转到登录页面，登录页面在灰跳直接会到详情页，不会保留回跳前的页面
+          */
+
+          const url = this.$route.query.url || '/'
+          this.$router.replace(url)
         }
       } catch (error) {
         alert(error.message)

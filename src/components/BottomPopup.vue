@@ -20,7 +20,9 @@
           <SpecSelector ref="childRef"></SpecSelector>
         </div>
         <div class="popup-bottom">
-          <div class="btn" v-if="title === '加入购物车'" @click="addCart">{{ title }}</div>
+          <div class="btn" v-if="title === '加入购物车'" @click="addCart">
+            {{ title }}
+          </div>
           <div class="btn" v-else :class="{ buy_now: title === '立即购买' }">
             {{ title }}
           </div>
@@ -60,11 +62,35 @@ export default {
     close () {
       this.$emit('input', false)
     },
+    handleConfirm () {
+      if (!this.$store.getters.getToken) {
+        // 在Vue组件中
+        this.$modal.confirm({
+          title: '温馨提示',
+          message: '你还没有登录，无法进行此操作哦！',
+          confirmButtonColor: '#ee0a24',
+          cancelBtnText: '去逛逛',
+          confirmBtnText: '去登录'
+        })
+          .then(() => {
+            this.$router.replace({
+              path: '/login',
+              query: {
+                url: this.$route.fullPath // 当前的路径地址
+              }
+            })
+          })
+          .catch(() => {
+            console.log('再逛逛')
+          })
+        return true
+      }
+      return false
+    },
     async addCart () {
       try {
-        // 判断是否有token 如果没有则弹出模态框
+        if (this.handleConfirm()) return
         const param = this.$refs.childRef.getChildData()
-
         // 发起添加到购物车而请求
         const { data } = await setAddCart(this.goodsId, param.selectSpecsIds, param.count)
         this.$store.commit('detail/getCartTotal', data.cart_total)

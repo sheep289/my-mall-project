@@ -179,3 +179,63 @@ c:\Users\28904\Pictures\Screenshots\屏幕截图 2025-02-28 015607.png
              最后:
                    // 再次调用请求商品数据的接口 重新更新渲染商品列表
                    context.dispatch('getCartListAction')
+
+
+---
+
+
+## 封装了命令时弹窗组件
+1. 创建基础弹窗组件(Modal)
+2. 创建实例化封装函数(utils/modal.js)
+3. 全局注册（main.js）
+4. 使用
+```JavaScript
+
+// 1确认对话框
+this.$dialog.confirm({
+  title: '删除确认',
+  message: '确定要删除这个项目吗？',
+  confirmButtonColor: '#ee0a24'
+})
+.then(() => {
+  console.log('执行删除操作')
+})
+.catch(() => {
+  console.log('取消删除')
+})
+
+// 2提示对话框
+this.$dialog.alert({
+  title: '操作提示',
+  message: '请先完成身份验证',
+  confirmButtonText: '去验证'
+})
+.then(() => {
+  console.log('跳转验证页面')
+})
+
+```
+
+5. 点击去登陆条跳转到/login 页面  
+    注意：
+    如果是其它页面跳转到登录页面，则登录成功后，进行回跳
+          这里不能用push进行跳转，因为返回上一步时，又会跳到登录页面，
+          所以用replace替代push ,  replace在这的作用是进行页面替换，相当于从详情页跳转到  登录页面，登录页面在灰跳直接会到详情页，不会保留回跳前的页面
+```JavaScript
+// 底层弹框组件进行条跳转
+ .then(() => {
+            this.$router.replace({
+              path: '/login',
+              query: {
+                url: this.$route.fullPath // 当前的路径地址
+              }
+            })
+          })
+          .catch(() => {
+            console.log('再逛逛')
+          })
+// login页面进行 回跳
+          const url = this.$route.query.url || '/'
+          this.$router.replace(url)
+
+```
