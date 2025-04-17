@@ -1,21 +1,26 @@
 <template>
-  <transition name="van-fade">
-    <div class="van-modal" v-show="visible" @click.self="handleWrapperClick">
-      <div class="van-dialog">
-        <div class="van-dialog__header" v-if="title">{{ title }}</div>
-        <div class="van-dialog__content">
+  <transition name="fade">
+    <!-- 遮罩层 -->
+    <div class="modal-mask" v-show="visible" @click.self="handleWrapperClick">
+      <!-- 弹窗容器 -->
+      <div class="modal-container">
+        <!-- 标题 -->
+        <div class="modal-header" v-if="title">{{ title }}</div>
+        <!-- 内容 可以插槽 -->
+        <div class="modal-content">
           <slot>{{ message }}</slot>
         </div>
-        <div class="van-dialog__footer">
+        <!-- 操作按钮 -->
+        <div class="modal-footer">
           <button
             v-if="showCancelButton"
-            class="van-dialog__cancel"
+            class="modal-cancel"
             @click="handleAction('cancel')"
           >
             {{ cancelBtnText }}
           </button>
           <button
-            class="van-dialog__confirm"
+            class="modal-confirm"
             :style="{ color: confirmButtonColor }"
             @click="handleAction('confirm')"
           >
@@ -56,7 +61,7 @@ export default {
   },
   data () {
     return {
-      visible: false,
+      visible: false, // 显示状态控制
       resolve: null,
       reject: null
     }
@@ -83,8 +88,9 @@ export default {
 }
 </script>
 
-<style scoped>
-.van-modal {
+<style lang="less" scoped>
+/* 遮罩层 */
+.modal-mask {
   position: fixed;
   top: 0;
   left: 0;
@@ -95,59 +101,60 @@ export default {
   align-items: center;
   justify-content: center;
   z-index: 2000;
+
+  // 容器
+  .modal-container {
+    width: 320px;
+    background-color: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    font-size: 16px;
+
+    .modal-header {
+      padding: 24px 16px 0;
+      font-weight: 500;
+      line-height: 24px;
+      text-align: center;
+    }
+
+    .modal-content {
+      padding: 16px;
+      text-align: center;
+    }
+
+    .modal-footer {
+      display: flex;
+      height: 48px;
+      line-height: 48px;
+    }
+
+    .modal-confirm,
+    .modal-cancel {
+      flex: 1;
+      margin: 0;
+      border: 0;
+      background: none;
+      cursor: pointer;
+    }
+
+    .modal-confirm:active,
+    .modal-cancel:active {
+      background-color: #f2f3f5;
+    }
+
+    .modal-cancel {
+      border-right: 1px solid #ebedf0;
+    }
+  }
 }
 
-.van-dialog {
-  width: 320px;
-  background-color: #fff;
-  border-radius: 16px;
-  overflow: hidden;
-  font-size: 16px;
-}
-
-.van-dialog__header {
-  padding: 24px 16px 0;
-  font-weight: 500;
-  line-height: 24px;
-  text-align: center;
-}
-
-.van-dialog__content {
-  padding: 16px;
-  text-align: center;
-}
-
-.van-dialog__footer {
-  display: flex;
-  height: 48px;
-  line-height: 48px;
-}
-
-.van-dialog__confirm,
-.van-dialog__cancel {
-  flex: 1;
-  margin: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
-}
-
-.van-dialog__confirm:active,
-.van-dialog__cancel:active {
-  background-color: #f2f3f5;
-}
-
-.van-dialog__cancel {
-  border-right: 1px solid #ebedf0;
-}
-
-.van-fade-enter-active,
-.van-fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.3s;
 }
 
-.van-fade-enter,
-.van-fade-leave-to {
+.fade-enter,
+.fade-leave-to {
   opacity: 0;
 }
 </style>

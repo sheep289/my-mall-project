@@ -70,7 +70,8 @@ export default {
           message: '你还没有登录，无法进行此操作哦！',
           confirmButtonColor: '#ee0a24',
           cancelBtnText: '去逛逛',
-          confirmBtnText: '去登录'
+          confirmBtnText: '去登录',
+          closerOnClickModal: false
         })
           .then(() => {
             this.$router.replace({
@@ -79,10 +80,9 @@ export default {
                 url: this.$route.fullPath // 当前的路径地址
               }
             })
+            this.$emit('input', false) // 关闭底层弹框
           })
-          .catch(() => {
-            console.log('再逛逛')
-          })
+          .catch(() => {})
         return true
       }
       return false
@@ -94,7 +94,7 @@ export default {
         // 发起添加到购物车而请求
         const { data } = await setAddCart(this.goodsId, param.selectSpecsIds, param.count)
         this.$store.commit('detail/getCartTotal', data.cart_total)
-        alert('加入购物车成功')
+        this.$toast('加入购物车成功')
         this.$emit('input', false)
       } catch (error) {
         console.log(error.message)
@@ -110,6 +110,10 @@ export default {
         document.body.style.overflow = 'auto'
       }
     }
+  },
+  // 在组件销毁时，无论当前弹框是否可见（即value是否为true），都强制恢复body滚动。确保组件销魂时而watch未监听到，导致body的overflow没有被虫子
+  beforeDestroy () {
+    document.body.style.overflow = 'auto'
   }
 }
 </script>

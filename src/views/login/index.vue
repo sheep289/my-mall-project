@@ -54,11 +54,11 @@ export default {
   computed: {
     verify () {
       if (!/^1[3-9]\d{9}$/.test(this.username)) {
-        alert('请输入正确的手机号')
+        this.$toast('请输入正确的手机号')
         return false
       }
       if (!/^[\S]{6,12}$/.test(this.password)) {
-        alert('密码长度为6~12位')
+        this.$toast('密码长度为6~12位')
         return false
       }
       return true
@@ -72,9 +72,8 @@ export default {
           // 发起登录请求
           const res = await setLogin(this.username, this.password)
           // 将用户token权证存储到vuex中
+          this.$toast('登录成功')
           this.$store.commit('user/setUserInfo', res.data)
-
-          alert('登录成功')
           /*
           如果是其它页面跳转到登录页面，则登录成功后，进行回跳
           这里不能用push进行跳转，因为返回上一步时，又会跳到登录页面，
@@ -85,8 +84,7 @@ export default {
           this.$router.replace(url)
         }
       } catch (error) {
-        alert(error.message)
-        console.log(error.message)
+        console.log(error)
       }
     },
     goRegister () {

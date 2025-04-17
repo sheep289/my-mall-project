@@ -3,6 +3,7 @@
 // 好处：不会污染原始的 axios 实例
 */
 import axios from 'axios'
+import { Toast } from 'vant'
 const instance = axios.create({
   baseURL: 'http://localhost',
   timeout: 5000
@@ -10,6 +11,13 @@ const instance = axios.create({
 
 instance.interceptors.request.use(function (config) {
   // 在发送请求之前做些什么
+  Toast.loading({
+    message: '加载中...',
+    forbidClick: true,
+    loadingType: 'spinner',
+    duration: 0
+  })
+
   return config
 }, function (error) {
   // 对请求错误做些什么
@@ -21,8 +29,11 @@ instance.interceptors.response.use(function (response) {
   // 2xx 范围内的状态码都会触发该函数。
   const res = response.data
   if (res.status !== 0) {
-    // alert(res.message)
+    Toast(res.message)
     // 抛出异常
+    return Promise.reject(res.message)
+  } else {
+    Toast.clear()
   }
   // 对响应数据做点什么
   return res

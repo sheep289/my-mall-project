@@ -1,4 +1,5 @@
 import { getCartList, setUpdateCount, deleteCartList } from '@/api/cart'
+import { Toast } from 'vant'
 export default {
   namespaced: true,
   state () {
@@ -38,7 +39,7 @@ export default {
     },
     async clearCartListAction (context, cartIds) {
       await deleteCartList(cartIds)
-      alert('删除成功')
+      Toast('删除成功')
       // 再次调用请求商品数据的接口 重新更新渲染商品列表
       context.dispatch('getCartListAction')
     }

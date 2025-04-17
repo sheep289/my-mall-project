@@ -51,9 +51,10 @@
             class="code-btn"
             :disabled="isCounting"
             @click.prevent="getVerifyCode"
+            ref="btn"
           >
             {{
-              seconds === totalSeconds ? codeBtnText : seconds + "秒后重新获取"
+              seconds === totalSeconds ? '获取验证码' : seconds + "秒后重新获取"
             }}
           </button>
         </div>
@@ -82,7 +83,6 @@ export default {
         code: ''
       },
       isCounting: false,
-      codeBtnText: '获取验证码',
       timerId: null, // 存储定时器
       totalSeconds: 60, // 总秒速
       seconds: 60 // 倒计时秒速
@@ -91,33 +91,34 @@ export default {
   computed: {
     verify () {
       if (!/^[\u4e00-\u9fa5A-Za-z0-9_]{2,20}$/.test(this.form.nickname)) {
-        throw new Error('用户名无效')
+        this.$toast('用户名无效')
+        // throw new Error('用户名无效')
+        return false
       }
       if (!/^1[3-9]\d{9}$/.test(this.form.username)) {
-        throw new Error('请输入正确的手机号，手机长号长度为11')
+        this.$toast('请输入正确手机号')
+        // throw new Error('请输入正确的手机号，手机长号长度为11')
+        return false
       }
       if (!/^[\S]{6,12}$/.test(this.form.password)) {
-        throw new Error('密码长度为6~12位')
-      }
-      if (!this.form.code === '123456') {
-        throw new Error('测试验证码为123456')
+        this.$toast('密码长度为6~12位')
+        // throw new Error('密码长度为6~12位')
+        return false
       }
       return true
     }
   },
   methods: {
     async handleSubmit () {
-      // 后续添加提交逻辑
       try {
         if (this.verify) {
           const res = await setRegister(this.form.username, this.form.password, this.form.nickname)
           if (res.status === 0) {
-            alert('注册成功')
+            this.$toast('注册成功')
           }
         }
       } catch (error) {
-        console.log(error.message)
-        alert(error.message)
+        console.log(error)
       }
     },
 
@@ -125,6 +126,7 @@ export default {
       // 后续添加验证码获取逻辑
       // 当上面的手机号密码符合要求则可以正确获取验证码操作
 
+      if (!this.verify) return
       if (!this.timerId) {
         this.timerId = setInterval(() => {
           this.seconds--

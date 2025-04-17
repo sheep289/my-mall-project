@@ -1,5 +1,5 @@
 <template>
-  <div class="prodetail">
+  <div class="prodetail"  v-if="detail.title">
     <!-- 标题 -->
     <TopTitle>
       <h3>商品详情页</h3>

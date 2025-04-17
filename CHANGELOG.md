@@ -184,7 +184,7 @@ c:\Users\28904\Pictures\Screenshots\屏幕截图 2025-02-28 015607.png
 ---
 
 
-## 封装了命令时弹窗组件
+## 封装了命令式弹窗组件(支持promise),链式调用
 1. 创建基础弹窗组件(Modal)
 2. 创建实例化封装函数(utils/modal.js)
 3. 全局注册（main.js）
@@ -239,3 +239,31 @@ this.$dialog.alert({
           this.$router.replace(url)
 
 ```
+
+---
+
+## 定义loading加载指令
+ v-loading=“布尔值” 可以执行loading加载效果
+
+ 1. 创建loading组件，写好要实现的要是
+ 2. main.js中注册全局组件
+    import loadingDirective from './utils/loading'
+    Vue.directive('loading', loadingDirective)
+ 3. 在utlis中新建一个loading,js，返回是一个对象，并导出对象
+
+
+ ## 加载提示 
+ 1. 统一处理请求后台时添加loading效果 （utlis/request） 请求拦截器中添加 ：用vant2组件库中Toast组件
+    在发送请求之前做些什么
+    开启loading,禁止点击点击（相当于节流处理，防止多次无效触发）
+
+    数据响应回来后关闭loading加载
+
+2. 在页面中间弹出黑色半透明提示，用于消息通知，反馈到页面，login与rregister等页面的添加了vant2组件中的Toast轻提示
+
+3. 解决了Toast获取不到message内容
+
+## 添加路由前置守卫
+可以查看vue router官网文档
+对支付页面（pay）订单页面（myorder）等页面进行拦截,后续还需要拦截直接往数组里面添加拦截路径就行
+

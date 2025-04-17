@@ -142,9 +142,18 @@ export default {
     clearHandle () {
       // 如果选择的商品小于等于0则退出
       if (this.filterSelCart.length <= 0) return
-      const cartIds = this.filterSelCart.map(item => item.cart_id)
-      this.$store.dispatch('cart/clearCartListAction', cartIds)
-      this.isEdit = true
+      this.$modal.confirm({
+        message: `你确定将这${this.filterSelCart.length}件商品删除`,
+        confirmButtonColor: '#ee0a24',
+        cancelBtnText: '我再想想',
+        confirmBtnText: '删除'
+      })
+        .then(() => {
+          const cartIds = this.filterSelCart.map(item => item.cart_id)
+          this.$store.dispatch('cart/clearCartListAction', cartIds)
+          this.isEdit = true
+        })
+        .catch(() => { })
     }
   }
 
