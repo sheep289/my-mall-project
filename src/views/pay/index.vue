@@ -21,37 +21,93 @@
       </div>
 
       <!-- 商品卡片 -->
-      <div class="goods-item box">
+      <div
+        class="goods-item box"
+        v-for="(item, index) in orderList"
+        :key="index"
+      >
         <!-- 头部区域 -->
         <div class="goods-item-top">
           <div class="goods-img">
-            <img src="@/assets/categood.png" alt="goods-img" />
+            <img
+              :src="item.color_image || item.goods_coverImg"
+              alt="goods-img"
+            />
           </div>
-          <div class="goods-name">
-            <p>
-              三星手机 SAMSUNG Galaxy S23 8GB+256GB 超视觉夜拍系统 超清夜景
-              悠雾紫 5G手机 游戏拍照旗舰机s23
-            </p>
-            <div class="price-info">
-              <p>x1</p>
-              <span>￥9999.00</span>
+          <div class="goods-content">
+            <div class="goods-title">
+              <p>
+                {{ item.goods_title }}
+              </p>
+            </div>
+
+            <!-- 规格 -->
+            <div class="goods-specs">
+              {{ item.color_name }} ; {{ item.memory_name }}
+            </div>
+
+            <!-- 价格  -->
+            <div class="price_add_count">
+              <div class="price">
+                <strong><span class="symbol">￥</span>{{ item.price }}</strong>
+              </div>
+              <div class="price-max">
+                <small>￥{{ item.price }}</small>
+              </div>
+              <!-- 数量 -->
+              <div class="count">
+                <Count v-model="item.quantity"></Count>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- 信息区域 -->
-        <div class="pay-info">
-          <div class="total-price">共 3 件 合计：<span>￥9999.00</span></div>
-          <div class="coupon info-box">
-            <span>优惠券：</span>
-            <span>无优惠券使用</span>
+        <!-- 服务选型 -->
+        <div class="serve-options">
+          <div class="dispatching info-box">
+            <span>配送：</span>
+            <span>快递包邮</span>
           </div>
-          <div class="give-money info-box">
-            <span>配送费用：</span>
-            <span>+￥10.00</span>
+          <div class="remark info-box">
+            <span>留言：</span>
+            <div class="remark-text">
+              akdsfjalfjladf000000000000000000000jal
+            </div>
+            <van-icon name="arrow" size="10px" color="#666" />
           </div>
         </div>
       </div>
+
+      <!-- 信息区域 -->
+      <div class="pay-info box">
+        <h3>价格明细</h3>
+        <div class="total-price-box info-box">
+          <h4>商品总价 <small class="total-quantity">共 5 将宝贝</small></h4>
+          <div class="total-price">
+            <span><small>￥</small>9999.00</span>
+          </div>
+        </div>
+        <div class="total-min info-box">
+          <h4>共减</h4>
+          <span><small>-￥</small>10.00</span>
+        </div>
+        <div class="coupon info-box">
+          <span>优惠券：</span>
+          <span v-if="true">无优惠券使用</span>
+          <span v-else style="color: #ff5000"><small>-￥</small>25.00</span>
+        </div>
+        <div class="give-money info-box">
+          <span>配送费用：</span>
+          <span><small>-￥</small>10.00</span>
+        </div>
+        <div class="total-price-box info-box">
+          <h4>合计</h4>
+          <div class="total-price">
+            <span style="font-size: 8px">￥</span>9999.00
+          </div>
+        </div>
+      </div>
+
       <div class="pay-method box">
         <div class="pay-method-box">支付方式</div>
         <!-- 余额支付 -->
@@ -70,27 +126,78 @@
     </div>
 
     <div class="bottom-bar">
-      <div class="payment">
-        实付款：<span>￥9999.00</span>
-      </div>
-      <div class="submit">
-        提交订单
-      </div>
+      <div class="payment">实付款：<span>￥9999.00</span></div>
+      <div class="submit">提交订单</div>
     </div>
   </div>
 </template>
 
 <script>
 import TopTitle from '@/components/TopTitle.vue'
+import Count from '@/components/Count.vue'
+import { getChekoutOrderData } from '@/api/pay'
 export default {
   components: {
-    TopTitle
+    TopTitle,
+    Count
+  },
+  data () {
+    return {
+      orderList: []
+    }
+  },
+  created () {
+    this.getOrderLIst()
+  },
+  computed: {
+    mode () {
+      return this.$route.query.mode
+    },
+    cartIds () {
+      // 从字符串转回数组
+      const cartIdsArray = this.$route.query.cartIds.split(',').map(Number)
+      return cartIdsArray
+    },
+    goodsId () {
+      return this.$route.query.goodsId
+    },
+    specs () {
+      return JSON.parse(this.$route.query.specs)
+    },
+    quantity () {
+      return this.$route.query.quantity
+    }
+  },
+  methods: {
+    async getOrderLIst () {
+      try {
+        if (this.mode === 'cart') {
+          const { data } = await getChekoutOrderData(this.mode, { cartIds: this.cartIds })
+          this.orderList = data
+        }
+        if (this.mode === 'buyNow') {
+          const { data } = await getChekoutOrderData(this.mode, {
+            goodsId: this.goodsId,
+            specValueIds: this.specs,
+            quantity: this.quantity
+          })
+          this.orderList = data
+        }
+      } catch (error) {
+        console.log('请求失败', error)
+      }
+    }
   }
 }
 </script>
 
 <style lang="less" scoped>
 .pay {
+  overflow-y: auto;
+  padding-bottom: 80px;
+  small {
+    font-size: 10px;
+  }
   .box {
     background-color: #fff;
     box-shadow: 0px 0px 20px 2px rgba(0, 0, 0, 0.1);
@@ -139,6 +246,16 @@ export default {
         }
       }
     }
+    // 公共属性
+    .info-box {
+      padding: 10px 0;
+      font-size: 12px;
+      color: #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0 12px;
+    }
     .goods-item {
       display: flex;
       flex-direction: column;
@@ -151,55 +268,105 @@ export default {
           img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
           }
         }
-        .goods-name {
-          width: 68%;
-          font-size: 14px;
-          font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-            Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
-            sans-serif;
-          margin-top: 10px;
-          P {
-            display: -webkit-box; //设置元素为弹性盒子
-            -webkit-box-orient: vertical; //设置盒子的排列方式
-            -webkit-line-clamp: 2; //指定要显示的行数
-            overflow: hidden;
+        .goods-content {
+          width: 220px;
+          padding: 6px;
+          .goods-title,
+          .goods-specs {
             margin-bottom: 10px;
           }
-          .price-info {
+          .goods-title {
+            font-size: 14px;
+            color: #000;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont,
+              "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+              "Helvetica Neue", sans-serifd;
+            display: -webkit-box; //设置元素为弹性盒子
+            -webkit-box-orient: vertical; //设置盒子的排列方式
+            -webkit-line-clamp: 1; //指定要显示的行数
+            overflow: hidden;
+          }
+          .goods-specs {
+            padding: 0 4px;
+            font-size: 12px;
+            color: #929292;
+            width: fit-content;
+            background-color: rgba(168, 166, 166, 0.1);
+          }
+
+          .price_add_count {
             display: flex;
             justify-content: space-between;
-            span {
+            align-items: center;
+            .price {
+              font-size: 16px;
               color: #ff5000;
+              .symbol {
+                font-size: 10px;
+              }
+            }
+            .price-max {
+              color: #666;
+              font-size: 12px;
+              margin-left: 12px;
+            }
+            .count {
+              transform: scale(0.6); //将此盒子缩小
+              transform-origin: right; //指定缩放的基点
             }
           }
         }
       }
-
-      .pay-info {
-        height: 100px;
+      .serve-options {
+        .remark {
+          position: relative;
+          .remark-text {
+            width: 120px;
+            white-space: normal;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: absolute;
+            right: 10px;
+          }
+        }
+      }
+    }
+    .pay-info {
+      h4 {
         font-size: 14px;
-        .info-box {
-          padding: 10px 0;
+      }
+      h3 {
+        font-size: 16px;
+        padding: 10px 0;
+        margin: 0 12px;
+      }
+      .give-money {
+        border-bottom: 1px solid #d0c7c7;
+      }
+      .give-money {
+        :nth-child(2) {
+          color: #ff5000;
           font-size: 14px;
-          color: #333;
-          display: flex;
-          justify-content: space-between;
-          margin: 0 12px;
+        }
+      }
+      .total-price-box {
+        .total-quantity {
+          color: #666;
+          font-weight: normal;
+          font-size: 10px;
         }
         .total-price {
-          text-align: right;
-          margin-right: 12px;
-          span {
-            color: #ff5000;
-          }
+          font-weight: bold;
+          font-size: 16px;
         }
-        .give-money {
-          :nth-child(2) {
-            color: #ff5000;
-          }
+      }
+      .total-min {
+        span {
+          color: #ff5000;
+          font-size: 14px;
         }
       }
     }
@@ -229,7 +396,7 @@ export default {
       }
     }
   }
-  .bottom-bar{
+  .bottom-bar {
     width: 100%;
     height: 50px;
     position: fixed;
@@ -242,13 +409,13 @@ export default {
     align-items: center;
     justify-content: space-between;
     font-size: 14px;
-    .payment{
+    .payment {
       margin-left: 12px;
-      span{
+      span {
         color: #ff5000;
       }
     }
-    .submit{
+    .submit {
       height: 90%;
       width: 32%;
       background: linear-gradient(to bottom right, #fa2a1f, #fe5630);

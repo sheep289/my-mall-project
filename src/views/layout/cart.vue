@@ -78,6 +78,7 @@
           class="goPay-btn"
           v-if="isEdit"
           :class="{ active: getSelCartCount === 0 }"
+          @click="goPay"
         >
           结算({{ getSelCartCount }})
         </div>
@@ -154,6 +155,18 @@ export default {
           this.isEdit = true
         })
         .catch(() => { })
+    },
+    goPay () {
+      if (this.filterSelCart.length > 0) {
+        this.$router.push({
+          path: '/pay',
+          query: {
+            mode: 'cart',
+            // 路由传不能传递数组，url参数只能传递字符串
+            cartIds: this.filterSelCart.map(item => item.cart_id).join(',')
+          }
+        })
+      }
     }
   }
 

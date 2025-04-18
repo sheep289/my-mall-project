@@ -23,7 +23,7 @@
           <div class="btn" v-if="title === '加入购物车'" @click="addCart">
             {{ title }}
           </div>
-          <div class="btn" v-else :class="{ buy_now: title === '立即购买' }">
+          <div class="btn" v-else :class="{ buy_now: title === '立即购买' }" @click="buyNow">
             {{ title }}
           </div>
         </div>
@@ -56,6 +56,9 @@ export default {
   computed: {
     goodsId () {
       return this.$store.state.detail.detail.id
+    },
+    specParam () {
+      return this.$refs.childRef.getChildData()
     }
   },
   methods: {
@@ -90,15 +93,28 @@ export default {
     async addCart () {
       try {
         if (this.handleConfirm()) return
-        const param = this.$refs.childRef.getChildData()
         // 发起添加到购物车而请求
-        const { data } = await setAddCart(this.goodsId, param.selectSpecsIds, param.count)
+        const { data } = await setAddCart(this.goodsId, this.specParam.selectSpecsIds, this.specParm.count)
         this.$store.commit('detail/getCartTotal', data.cart_total)
         this.$toast('加入购物车成功')
         this.$emit('input', false)
       } catch (error) {
         console.log(error.message)
       }
+    },
+    buyNow () {
+      // 判断是否又token权证
+
+      this.$router.push({
+        path: '/pay',
+        query: {
+          mode: 'buyNow',
+          goodsId: this.goodsId,
+          specs: JSON.stringify(this.specParam.selectSpecsIds),
+          quantity: this.specParam.count
+        }
+
+      })
     }
   },
   //   记录
