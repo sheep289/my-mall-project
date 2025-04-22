@@ -9,6 +9,9 @@ import Search from '@/views/search'
 import Prodetail from '@/views/prodetail'
 import SearchList from '@/views/search/list.vue'
 import Register from '@/views/login/register.vue'
+import Address from '@/views/address'
+import CreateAddress from '@/views/address/createAddress.vue'
+import Update from '@/views/address/update.vue'
 
 // 二级路由
 import Home from '@/views/layout/home.vue'
@@ -44,12 +47,17 @@ const router = new VueRouter({
     // 问题：如何确认是哪个商品的详情
     // 解决：动态路由传参 确认将来是哪个商品，路由携带参数传参
     { path: '/prodetail/:id', component: Prodetail },
-    { path: '/searchList', component: SearchList }
-
+    { path: '/searchList', component: SearchList },
+    {
+      path: '/address',
+      component: Address
+    },
+    { path: '/create', component: CreateAddress },
+    { path: '/update', component: Update }
   ]
 })
 
-const authUrl = ['/pay', '/myorder']
+const authUrl = ['/pay', '/myorder', '/address', '/create', '/update']
 // 路由前置守卫
 router.beforeEach((to, from, next) => {
   // to.path是要去的页面路径

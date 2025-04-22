@@ -108,3 +108,38 @@
 
 问题2：如果跳转时为对象
 解决：可以将对象转换为JSON字符串 ，然后跳转后拿到参数进行回转
+
+
+## upata组件中的问题（异步处理）
+问题： ​​异步数据加载和同步代码执行的时机冲突
+      当在 created 中调用 this.$store.dispatch('address/getAddressListAcion') 时，虽然发起了异步请求，但代码会继续同步执行 this.change()，此时 addressList 可能尚未从接口返回数据，导致 selecteAddress 为空数组，从而 this.selecteAddress[0] 为 undefined。
+解决： ​​使用 async/await 等待异步操作完成​，确保数据加载完成后再操作数据
+
+```javascript
+  async created() {
+  // 等待 Action 完成，确保 addressList 已更新
+  await this.$store.dispatch('address/getAddressListAcion');
+  this.change(); // 数据加载完成后执行
+},
+
+```
+
+## 收货地址交互效果
+问题：1. 更强烈的交互效果，例如，1.用户将数组二个对象设为默认地址，那就将第二个对象移到数组一个位置（unshift）
+      2. 自己定义的选择框（选择与不选来回切换）
+解决：（完成一半）
+```Javascript
+      //1. 将默认地址移除到第一个（有bug，视图不会自动更新，需要手动刷新)
+      const defaultIndex = data.findIndex(item => item.is_default)
+      if (defaultIndex > 0) {
+        const movedItem = data.splice(defaultIndex, 1)[0]
+        data.unshift(movedItem)
+      }
+
+          // 2. 选择与不选来回切换
+    toggleCheck (state, addressId) {
+      const address = state.addressList.find(item => item.user_address_id === addressId)
+      address.is_default = !address.is_default
+    }
+
+```

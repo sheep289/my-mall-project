@@ -342,6 +342,11 @@ export default {
 
     .all-checked {
       flex: 1;
+      input{
+        width: 14px;
+        height: 14px;
+        margin-right: 4px;
+      }
     }
     .all-price {
       font-size: 14px;

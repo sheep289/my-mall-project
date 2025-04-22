@@ -23,7 +23,12 @@
           <div class="btn" v-if="title === '加入购物车'" @click="addCart">
             {{ title }}
           </div>
-          <div class="btn" v-else :class="{ buy_now: title === '立即购买' }" @click="buyNow">
+          <div
+            class="btn"
+            v-else
+            :class="{ buy_now: title === '立即购买' }"
+            @click="buyNow"
+          >
             {{ title }}
           </div>
         </div>
@@ -85,7 +90,7 @@ export default {
             })
             this.$emit('input', false) // 关闭底层弹框
           })
-          .catch(() => {})
+          .catch(() => { })
         return true
       }
       return false
@@ -94,7 +99,7 @@ export default {
       try {
         if (this.handleConfirm()) return
         // 发起添加到购物车而请求
-        const { data } = await setAddCart(this.goodsId, this.specParam.selectSpecsIds, this.specParm.count)
+        const { data } = await setAddCart(this.goodsId, this.specParam.selectSpecsIds, this.specParam.count)
         this.$store.commit('detail/getCartTotal', data.cart_total)
         this.$toast('加入购物车成功')
         this.$emit('input', false)

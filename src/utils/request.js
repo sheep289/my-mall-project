@@ -4,6 +4,8 @@
 */
 import axios from 'axios'
 import { Toast } from 'vant'
+import { moverInfo } from '@/utils/storage'
+import router from '@/router'
 const instance = axios.create({
   baseURL: 'http://localhost',
   timeout: 5000
@@ -30,6 +32,17 @@ instance.interceptors.response.use(function (response) {
   const res = response.data
   if (res.status !== 0) {
     Toast(res.message)
+
+    // token过期处理
+    if (res.status === 401) {
+      moverInfo() // 清除本地存储
+      router.push({
+        path: '/login',
+        query: {
+          url: router.currentRoute.fullPath // 跳转到登录页面，带原路由参数一遍登录后重定向
+        }
+      })
+    }
     // 抛出异常
     return Promise.reject(res.message)
   } else {

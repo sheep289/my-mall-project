@@ -276,5 +276,41 @@ this.$dialog.alert({
 2. 根据mode（cart,buyNow）参数进行判断，mode类型分别有着对应的请求参数 
 3. 拿到数据进行页面动态渲染
 4. 计算属性：计算总价格，商品总数量，以及优惠券等业务
+5. 调用api 接口获取收货地址列表 将收获地址存储到vuex中
+    5.1. 获取地址列表：将地区与详细地址拼接
+    5.2. 添加收获地址 (逻辑需fx)  1.绑定  blur事件，当失去焦点时触发validateField方法（校验），2. 通过后提交
+    5.3 删除收获地址
+    5.4 修改收获地址：问题：当跳转到修改路由页面时，vuex中address模块下的addressList状态是有数据的，当刷新页面时，addressLIst为空，所以得再次调用模块中的actions里的 请求方法， ​​使用 async/await 等待异步操作完成​，确保数据加载完成后在渲染
+    5.5 设置默认地址 点击默认地址       this.addressList.forEach((item, i) => {
+        // 通过Vue.set确保响应式更新
+        this.$set(item, 'is_default', i === index)
+      })
+    5.6 收获地址其它交互效果: 高亮，
+        
+
 5. 处理登录时token 权证时候存在
 6. 结算
+
+5. 添加收货地址地区级联选择
+```JavaScript
+
+    async onChange ({ value, selectedOptions }) {
+      // console.log(value) // 可以拿到region_id
+      if (value === selectedOptions[0].value) {
+        // 市数据
+        const { data } = await getRegionCity(value)
+        // 修改省级数据加载逻辑，预先声明children字段：
+        const handleData = data.map(item => ({ ...item, text: item.region_name, value: item.region_id, children: [] }))
+        this.options.filter(item => item.value === value)[0].children = handleData
+
+        // 县数据
+      } else if (value === selectedOptions[1].value) {
+        const { data } = await getRegionCounty(value)
+        // 修改市级数据加载逻辑，预先声明children字段：
+        const handleData = data.map(item => ({ ...item, text: item.region_name, value: item.region_id }))
+        // 这次筛选的是省children（也就是市的数据） 双选出点击的市，在将对应的县复制给children
+        selectedOptions[0].children.filter(item => item.value === value)[0].children = handleData
+      }
+    },
+
+```

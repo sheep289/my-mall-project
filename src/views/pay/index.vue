@@ -1,6 +1,7 @@
 <template>
   <div class="pay">
-    <div class="top-title">
+    <!-- 头部标题 -->
+    <div>
       <TopTitle>
         <h3>订单结算台</h3>
       </TopTitle>
@@ -8,7 +9,7 @@
 
     <div class="container">
       <!-- 收货货地址 -->
-      <div class="shipping-address box">
+      <div class="shipping-address box" @click="addAddress">
         <div class="address-icon">
           <img src="@/assets/address.png" alt="address" />
         </div>
@@ -51,9 +52,9 @@
               <div class="price">
                 <strong><span class="symbol">￥</span>{{ item.price }}</strong>
               </div>
-              <div class="price-max">
+              <!-- <div class="price-max">
                 <small>￥{{ item.price }}</small>
-              </div>
+              </div> -->
               <!-- 数量 -->
               <div class="count">
                 <Count v-model="item.quantity"></Count>
@@ -186,6 +187,10 @@ export default {
       } catch (error) {
         console.log('请求失败', error)
       }
+    },
+    // 跳转到收获地址列表
+    addAddress () {
+      this.$router.push('/address')
     }
   }
 }
@@ -203,13 +208,6 @@ export default {
     box-shadow: 0px 0px 20px 2px rgba(0, 0, 0, 0.1);
     margin-top: 10px;
     border-radius: 10px;
-  }
-  .top-title {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
   }
   .container {
     margin: 50px 8px 12px 8px;
