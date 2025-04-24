@@ -15,8 +15,8 @@
         </div>
         <!-- 收货信息 -->
         <div class="address-message">
-          <span>王宝强18578983746</span>
-          <span>湖南省长沙市长沙环境保护职业技术学院</span>
+          <span>{{ address.delivery_name }} {{ address.delivery_phone}}</span>
+          <span>{{ address.joinDetail }}</span>
         </div>
         <van-icon name="arrow" size="16px" color="#666" />
       </div>
@@ -137,6 +137,7 @@
 import TopTitle from '@/components/TopTitle.vue'
 import Count from '@/components/Count.vue'
 import { getChekoutOrderData } from '@/api/pay'
+import { mapState } from 'vuex'
 export default {
   components: {
     TopTitle,
@@ -144,13 +145,17 @@ export default {
   },
   data () {
     return {
-      orderList: []
+      orderList: [],
+      address: {}
     }
   },
-  created () {
+  async created () {
+    await this.$store.dispatch('address/getAddressListAcion')
     this.getOrderLIst()
+    this.getDefaultAddress()
   },
   computed: {
+    ...mapState('address', ['addressList']),
     mode () {
       return this.$route.query.mode
     },
@@ -190,7 +195,29 @@ export default {
     },
     // 跳转到收获地址列表
     addAddress () {
-      this.$router.push('/address')
+      this.$router.push({
+        path: '/address',
+        query: {
+          addressId: this.address.user_address_id
+        }
+      })
+    },
+    getDefaultAddress () {
+      // // 获取addressId
+      const addId = parseInt(this.$route.query.addressId)
+
+      //  1.判断addId是否存在，如果不存在，说明用户没有选择其它地址（而是默认地址渲染）
+      // 2.如果存在，说明用户选择了新的地址（重address页面跳转过来的），则需要根据携带的addressId查询对应的数据进行渲染
+
+      if (!addId) {
+        // 1获取收获地址里的默认地址
+        const findData1 = this.addressList.find(item => item.is_default) || this.addressList[0]
+        this.address = findData1
+      } else {
+        // 2.重新选择的地址
+        const findData2 = this.addressList.find(item => item.user_address_id === addId)
+        this.address = findData2
+      }
     }
   }
 }
@@ -237,11 +264,12 @@ export default {
         flex-direction: column;
         flex: 1;
         margin: 0 20px 0 16px;
-        :nth-child(2) {
+        line-height: 1.5;
+      /*  :nth-child(2) {
           white-space: nowrap; //禁止换行
           text-overflow: ellipsis; //使用省略号表示溢出
           overflow: hidden;
-        }
+        } */
       }
     }
     // 公共属性

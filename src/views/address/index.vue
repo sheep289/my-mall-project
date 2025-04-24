@@ -53,7 +53,7 @@
     <!-- 底部 添加新地址 -->
     <div class="address-bottom">
       <div class="bottom-text" @click="addAddress">
-        <p>添加新地址</p>
+        <p>添加地址</p>
       </div>
     </div>
   </div>
@@ -67,23 +67,21 @@ export default {
   name: 'editAddress',
   data () {
     return {
-      activeIndex: this.getQueryAddressId,
+      activeIndex: '',
       timerId: null
     }
   },
-  created () {
+  async created () {
     if (this.$store.getters.getToken) {
       // 获取收货地址列表
-      this.$store.dispatch('address/getAddressListAcion')
+      await this.$store.dispatch('address/getAddressListAcion')
     }
+    this.getAddressIndex()
   },
   computed: {
     ...mapState('address', ['addressList']),
-    ...mapGetters('address', ['']),
+    ...mapGetters('address', [''])
     // 接收pay订单页面查询传参
-    getQueryAddressId () {
-      return this.$route.query
-    }
   },
   methods: {
     addAddress () {
@@ -120,27 +118,27 @@ export default {
       this.$store.dispatch('address/setDefaultAddressAction', addressId)
     },
     selectAddress (item, index) {
+      // 如果路由参数不存在，说明不是重其它页面跳转过来的，则无触发该方法，不要做高亮以跳转
+      if (!this.$route.query.addressId) return
       this.activeIndex = index
-      // const selectAddress = {
-      //   delivery_name: item.delivery_name,
-      //   delivery_phone: item.delivery_phone,
-      //   joinAddress: item.joinDetail,
-      //   addressId: item.user_address_id
-      // }
       if (!this.timerId) {
         this.timerId = setTimeout(() => {
           this.$router.push({
             path: '/pay',
             query: {
-              delivery_name: item.delivery_name,
-              delivery_phone: item.delivery_phone,
-              joinAddress: item.joinDetail,
-              user_address_id: item.user_address_id
+              addressId: item.user_address_id
             }
           })
           this.timerId = null
         }, 300)
       }
+    },
+    getAddressIndex () {
+      // 获取pay支付页面跳转时携带的 地址id
+      const getAddressId = parseInt(this.$route.query.addressId)
+      // 利用findIndex查找地址对应的索引号 未查询到则是 -1
+      const index = this.addressList.findIndex(item => item.user_address_id === getAddressId)
+      this.activeIndex = index
     }
   },
   destroyed () {

@@ -285,7 +285,7 @@ this.$dialog.alert({
         // 通过Vue.set确保响应式更新
         this.$set(item, 'is_default', i === index)
       })
-    5.6 收获地址其它交互效果: 高亮，
+    5.6 收获地址其它交互效果: 高亮，当选择该地址时高亮加跳转到pay,选择地址时重pay跳转到address，高亮是跟随pay跳转时携带的addressId来显示的
         
 
 5. 处理登录时token 权证时候存在
