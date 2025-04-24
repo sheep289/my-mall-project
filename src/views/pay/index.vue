@@ -161,14 +161,14 @@ export default {
     },
     cartIds () {
       // 从字符串转回数组
-      const cartIdsArray = this.$route.query.cartIds.split(',').map(Number)
+      const cartIdsArray = this.$route.query.cartIds ? this.$route.query.cartIds.split(',').map(Number) : []
       return cartIdsArray
     },
     goodsId () {
       return this.$route.query.goodsId
     },
     specs () {
-      return JSON.parse(this.$route.query.specs)
+      return this.$route.query.specs ? JSON.parse(this.$route.query.specs) : {}
     },
     quantity () {
       return this.$route.query.quantity
@@ -198,6 +198,7 @@ export default {
       this.$router.push({
         path: '/address',
         query: {
+          url: this.$router.currentRoute.fullPath,
           addressId: this.address.user_address_id
         }
       })

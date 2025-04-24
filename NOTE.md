@@ -143,3 +143,40 @@
     }
 
 ```
+
+
+## 路由跳转参数丢失
+问题：立即购买携带参数跳转→到订单页面 订单页面跳转到选择地址页面，当从地址选择也买你返回订单页面时，立即购买的路由参数丢失，导致无法重新请求商品信息数据，
+  这是因为：路由跳转时没有保留原始参数
+解决1.：通过使用携带参数url: this.router.currentRoute.fullPath 进行跳转到收货地址页面，
+      地址栏页面回跳时路径为：this.$router.this.$route.query.url 并携带需要传递的新参数
+
+原理：fullpath的特性：this.$router.currentRoute.fullPath 会返回当前路由的完整路径（包含路径查询参数和hash）
+
+
+解决2 ：将原有的参数一同携带过去：例如query{ mode: this.mode} ,回跳时在携带回来:query:{ ...this.$route.query,新的参数：新的参数值}
+
+```javascript
+// 1.订单也跳转到收货地址页面
+this.$router.push({
+        path: '/address',
+        query: {
+          url: this.$router.currentRoute.fullPath,
+          addressId: this.address.user_address_id
+        }
+      })
+//  收货地址页面回跳到订单页面
+this.$router.replace({
+            path: this.$route.query.url,
+            query: {
+              // ...this.$route.query,
+              addressId: item.user_address_id
+            }
+          })
+
+```
+
+
+## 每个页面回退问题
+问题：返回上一步（跳转）之间是用replace还是push
+解决：？

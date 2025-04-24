@@ -123,9 +123,10 @@ export default {
       this.activeIndex = index
       if (!this.timerId) {
         this.timerId = setTimeout(() => {
-          this.$router.push({
-            path: '/pay',
+          this.$router.replace({
+            path: this.$route.query.url,
             query: {
+              // ...this.$route.query,
               addressId: item.user_address_id
             }
           })

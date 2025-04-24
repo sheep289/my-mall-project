@@ -36,7 +36,7 @@ export default {}
       left: 12px;
       top: 50%;
       transform: translateY(-50%);
-      padding: 10px;
+      // padding: 10px;
       font-size: 18px;
       color: #666;
       cursor: pointer;
