@@ -150,7 +150,7 @@ export default {
       if (status === 0) {
         this.$toast.success('添加成功')
         this.timerId = setTimeout(() => {
-          this.$router.replace('/address')
+          this.$router.replace(this.$route.query.url)
           this.timerId = null
         }, 1000)
       }

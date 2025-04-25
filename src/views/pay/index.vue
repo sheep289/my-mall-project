@@ -9,15 +9,29 @@
 
     <div class="container">
       <!-- 收货货地址 -->
-      <div class="shipping-address box" @click="addAddress">
+      <div
+        class="shipping-address box"
+        @click="addAddress"
+        v-if="addressList.length > 0"
+      >
         <div class="address-icon">
           <img src="@/assets/address.png" alt="address" />
         </div>
         <!-- 收货信息 -->
         <div class="address-message">
-          <span>{{ address.delivery_name }} {{ address.delivery_phone}}</span>
+          <span>{{ address.delivery_name }} {{ address.delivery_phone }}</span>
           <span>{{ address.joinDetail }}</span>
         </div>
+        <van-icon name="arrow" size="16px" color="#666" />
+      </div>
+
+      <!-- 无收货地址时 -->
+      <div class="shipping-address box" v-else @click="addAddress">
+        <div class="address-icon">
+          <img src="@/assets/address.png" alt="address" />
+        </div>
+        <!-- 收货信息 -->
+        <div class="address-message">请选择收货地址</div>
         <van-icon name="arrow" size="16px" color="#666" />
       </div>
 
@@ -50,7 +64,10 @@
             <!-- 价格  -->
             <div class="price_add_count">
               <div class="price">
-                <strong><span class="symbol">￥</span>{{ item.price }}</strong>
+                <strong
+                  ><span class="symbol">￥</span
+                  >{{ item.price.toFixed(2) }}</strong
+                >
               </div>
               <!-- <div class="price-max">
                 <small>￥{{ item.price }}</small>
@@ -67,12 +84,12 @@
         <div class="serve-options">
           <div class="dispatching info-box">
             <span>配送：</span>
-            <span>快递包邮</span>
+            <span>顺丰快递</span>
           </div>
           <div class="remark info-box">
-            <span>留言：</span>
+            <span >留言：</span>
             <div class="remark-text">
-              akdsfjalfjladf000000000000000000000jal
+              {{ remark }}
             </div>
             <van-icon name="arrow" size="10px" color="#666" />
           </div>
@@ -83,14 +100,19 @@
       <div class="pay-info box">
         <h3>价格明细</h3>
         <div class="total-price-box info-box">
-          <h4>商品总价 <small class="total-quantity">共 5 将宝贝</small></h4>
+          <h4>
+            商品总价
+            <small class="total-quantity"
+              >共 {{ orderList.length }} 将宝贝</small
+            >
+          </h4>
           <div class="total-price">
-            <span><small>￥</small>9999.00</span>
+            <span><small>￥</small>{{ totalPrice.toFixed(2) }}</span>
           </div>
         </div>
         <div class="total-min info-box">
           <h4>共减</h4>
-          <span><small>-￥</small>10.00</span>
+          <span><small>-￥</small>{{ handelPes.toFixed(2) }}</span>
         </div>
         <div class="coupon info-box">
           <span>优惠券：</span>
@@ -99,12 +121,12 @@
         </div>
         <div class="give-money info-box">
           <span>配送费用：</span>
-          <span><small>-￥</small>10.00</span>
+          <span><small>-￥</small>{{ handelPes.toFixed(2) }}</span>
         </div>
         <div class="total-price-box info-box">
           <h4>合计</h4>
           <div class="total-price">
-            <span style="font-size: 8px">￥</span>9999.00
+            <span style="font-size: 8px">￥</span>{{ lastPrice.toFixed(2) }}
           </div>
         </div>
       </div>
@@ -127,7 +149,9 @@
     </div>
 
     <div class="bottom-bar">
-      <div class="payment">实付款：<span>￥9999.00</span></div>
+      <div class="payment">
+        实付款：<span>￥{{ lastPrice.toFixed(2) }}</span>
+      </div>
       <div class="submit">提交订单</div>
     </div>
   </div>
@@ -145,14 +169,16 @@ export default {
   },
   data () {
     return {
-      orderList: [],
-      address: {}
+      orderList: [], // 订单列表
+      address: {}, // 存储地址
+      psf: 10, // 配送费
+      remark: '很期待该商品' // 存放留言
     }
   },
   async created () {
     await this.$store.dispatch('address/getAddressListAcion')
-    this.getOrderLIst()
-    this.getDefaultAddress()
+    await this.getOrderList() // 先获取数据
+    await this.getDefaultAddress()
   },
   computed: {
     ...mapState('address', ['addressList']),
@@ -170,15 +196,33 @@ export default {
     specs () {
       return this.$route.query.specs ? JSON.parse(this.$route.query.specs) : {}
     },
+    // 立即购买的数量
     quantity () {
-      return this.$route.query.quantity
+      return parseInt(this.$route.query.quantity)
+    },
+    // 1.动态计算商品总价格
+    totalPrice () {
+      return this.orderList.reduce((sum, item) => (sum + item.price * item.quantity) + this.psf, 0)
+    },
+    // 2.合计价格（减去优惠啥的）
+    lastPrice () {
+      return this.orderList.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    },
+    // 3.计算运费
+    handelPes () {
+      return this.psf * this.orderList.length
     }
+    // 4.共减
   },
   methods: {
-    async getOrderLIst () {
+    // 获取订单列表数据
+    async getOrderList () {
       try {
         if (this.mode === 'cart') {
           const { data } = await getChekoutOrderData(this.mode, { cartIds: this.cartIds })
+          data.forEach(item => {
+            item.price = parseFloat(item.price)
+          })
           this.orderList = data
         }
         if (this.mode === 'buyNow') {
@@ -186,6 +230,9 @@ export default {
             goodsId: this.goodsId,
             specValueIds: this.specs,
             quantity: this.quantity
+          })
+          data.forEach(item => {
+            item.price = parseFloat(item.price)
           })
           this.orderList = data
         }
@@ -199,7 +246,7 @@ export default {
         path: '/address',
         query: {
           url: this.$router.currentRoute.fullPath,
-          addressId: this.address.user_address_id
+          addressId: this.address ? this.address.user_address_id : ''
         }
       })
     },
@@ -209,7 +256,6 @@ export default {
 
       //  1.判断addId是否存在，如果不存在，说明用户没有选择其它地址（而是默认地址渲染）
       // 2.如果存在，说明用户选择了新的地址（重address页面跳转过来的），则需要根据携带的addressId查询对应的数据进行渲染
-
       if (!addId) {
         // 1获取收获地址里的默认地址
         const findData1 = this.addressList.find(item => item.is_default) || this.addressList[0]
@@ -266,7 +312,7 @@ export default {
         flex: 1;
         margin: 0 20px 0 16px;
         line-height: 1.5;
-      /*  :nth-child(2) {
+        /*  :nth-child(2) {
           white-space: nowrap; //禁止换行
           text-overflow: ellipsis; //使用省略号表示溢出
           overflow: hidden;
@@ -351,12 +397,12 @@ export default {
         .remark {
           position: relative;
           .remark-text {
-            width: 120px;
+            // width: 120px;
             white-space: normal;
             overflow: hidden;
             text-overflow: ellipsis;
             position: absolute;
-            right: 10px;
+            right: 14px;
           }
         }
       }

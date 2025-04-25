@@ -85,8 +85,12 @@ export default {
   },
   methods: {
     addAddress () {
-      this.$router.push('/create')
-      console.log(this.getQueryAddressId)
+      this.$router.push({
+        path: '/create',
+        query: {
+          url: this.$router.currentRoute.fullPath
+        }
+      })
     },
     clearHandle (id) {
       if (!id) return
@@ -105,6 +109,7 @@ export default {
       this.$router.push({
         path: '/update',
         query: {
+          url: this.$router.currentRoute.fullPath,
           addressId
         }
       })
@@ -119,7 +124,7 @@ export default {
     },
     selectAddress (item, index) {
       // 如果路由参数不存在，说明不是重其它页面跳转过来的，则无触发该方法，不要做高亮以跳转
-      if (!this.$route.query.addressId) return
+      if (!this.$route.query.url) return
       this.activeIndex = index
       if (!this.timerId) {
         this.timerId = setTimeout(() => {
