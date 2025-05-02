@@ -6,6 +6,7 @@ import axios from 'axios'
 import { Toast } from 'vant'
 import { moverInfo } from '@/utils/storage'
 import router from '@/router'
+import store from '@/store'
 const instance = axios.create({
   baseURL: 'http://localhost',
   timeout: 5000
@@ -19,7 +20,11 @@ instance.interceptors.request.use(function (config) {
     loadingType: 'spinner',
     duration: 0
   })
-
+  // 每次请求前自动添加token
+  const token = store.getters.getToken
+  if (token) {
+    config.headers.Authorization = token
+  }
   return config
 }, function (error) {
   // 对请求错误做些什么

@@ -303,7 +303,20 @@ this.$dialog.alert({
     最后：发起请求成功， 再次调用 await this.getPayModeList()，更新余额 → 提示支付成功  →  跳转到我的订单页面
 
 8. 处理立即购买时token 权证时候存在
-     - 利用混入（mixins）方法  可以实现 （判断 + 弹层） 复用 混入
+       - mixins复用，处理登录确认框的弹出
+       - 利用混入（mixins）方法  可以实现 （判断 + 弹层） 复用 混入
+9. 使用axios 拦截器 （统一处理token）
+       - 避免每次手动添加token 可以在全局拦截器中自动注入
+
+```javascript
+// 每次请求前自动添加token
+  const token = store.getters.getToken
+  if (token) {
+    config.headers.Authorization = token
+  }
+  return config
+
+```
 5. 添加收货地址地区级联选择
 ```JavaScript
 
