@@ -13,3 +13,24 @@ export const getChekoutOrderData = (mode, obj) => {
     }
   })
 }
+
+// 获取支付类型与余额
+export const getPayModeData = () => {
+  return request.get('/my/pay/mode', {
+    headers: {
+      Authorization: store.getters.getToken
+    }
+  })
+}
+
+// 提交订单
+export const submitOrder = (mode, obj) => {
+  return request.post('/my/checkout/submit', {
+    mode,
+    ...obj
+  }, {
+    headers: {
+      Authorization: store.getters.getToken
+    }
+  })
+}

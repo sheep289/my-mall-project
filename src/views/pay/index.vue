@@ -22,7 +22,7 @@
           <span>{{ address.delivery_name }} {{ address.delivery_phone }}</span>
           <span>{{ address.joinDetail }}</span>
         </div>
-        <van-icon name="arrow" size="16px" color="#666" />
+        <van-icon name="arrow" class="arrows" />
       </div>
 
       <!-- 无收货地址时 -->
@@ -32,7 +32,7 @@
         </div>
         <!-- 收货信息 -->
         <div class="address-message">请选择收货地址</div>
-        <van-icon name="arrow" size="16px" color="#666" />
+        <van-icon name="arrow" class="arrows" />
       </div>
 
       <!-- 商品卡片 -->
@@ -87,11 +87,11 @@
             <span>顺丰快递</span>
           </div>
           <div class="remark info-box">
-            <span >留言：</span>
+            <span>留言：</span>
             <div class="remark-text">
               {{ remark }}
             </div>
-            <van-icon name="arrow" size="10px" color="#666" />
+            <van-icon name="arrow" class="arrows2" />
           </div>
         </div>
       </div>
@@ -126,7 +126,7 @@
         <div class="total-price-box info-box">
           <h4>合计</h4>
           <div class="total-price">
-            <span style="font-size: 8px">￥</span>{{ lastPrice.toFixed(2) }}
+            <small>￥</small>{{ lastPrice.toFixed(2) }}
           </div>
         </div>
       </div>
@@ -134,25 +134,31 @@
       <div class="pay-method box">
         <div class="pay-method-box">支付方式</div>
         <!-- 余额支付 -->
-        <div class="pay-method-box">
+        <div
+          class="pay-method-box"
+          v-for="(item, index) in payModeList"
+          :key="index"
+          @click="handleChecked(index)"
+        >
           <div class="money-icon">
-            <img src="@/assets/money.png" alt="money" />
+            <img :src="item.type_image" alt="money" />
           </div>
-          <span>余额支付：（可用余额￥666666.00 元）</span>
-          <div class="select">
-            <input type="checkbox" />
+          <span
+            >{{ item.type }}
+            <span v-if="item.balance"
+              >（可用余额￥{{ item.balance }} 元）</span
+            ></span
+          >
+          <div class="select" :class="{ red: item.isChecked }">
+            <van-icon name="passed" />
           </div>
         </div>
 
         <!-- 支付宝支付方式(样式直接使用 pay-method-box) -->
       </div>
     </div>
-
-    <div class="bottom-bar">
-      <div class="payment">
-        实付款：<span>￥{{ lastPrice.toFixed(2) }}</span>
-      </div>
-      <div class="submit">提交订单</div>
+    <div class="payNow-btn" @click="handelSubmitOrder">
+      立即支付<small>￥</small>{{ lastPrice.toFixed(2) }}
     </div>
   </div>
 </template>
@@ -160,7 +166,7 @@
 <script>
 import TopTitle from '@/components/TopTitle.vue'
 import Count from '@/components/Count.vue'
-import { getChekoutOrderData } from '@/api/pay'
+import { getChekoutOrderData, getPayModeData, submitOrder } from '@/api/pay'
 import { mapState } from 'vuex'
 export default {
   components: {
@@ -171,6 +177,7 @@ export default {
     return {
       orderList: [], // 订单列表
       address: {}, // 存储地址
+      payModeList: [], // 支付类型数据
       psf: 10, // 配送费
       remark: '很期待该商品' // 存放留言
     }
@@ -178,6 +185,7 @@ export default {
   async created () {
     await this.$store.dispatch('address/getAddressListAcion')
     await this.getOrderList() // 先获取数据
+    await this.getPayModeList()
     await this.getDefaultAddress()
   },
   computed: {
@@ -240,6 +248,19 @@ export default {
         console.log('请求失败', error)
       }
     },
+
+    // 获取支付方式数据
+    async getPayModeList () {
+      const { data } = await getPayModeData()
+      // data.isChecked = false
+      this.payModeList = data
+    },
+
+    handleChecked (index) {
+      this.payModeList.forEach((item, i) => {
+        this.$set(item, 'isChecked', index === i)
+      })
+    },
     // 跳转到收获地址列表
     addAddress () {
       this.$router.push({
@@ -265,6 +286,30 @@ export default {
         const findData2 = this.addressList.find(item => item.user_address_id === addId)
         this.address = findData2
       }
+    },
+    async handelSubmitOrder () {
+      // 利用some方法判断至少有一个支付方式被选择，如果都没选择则退出
+      const hasTrue = this.payModeList.some(item => item.isChecked === true)
+      if (!hasTrue) return this.$toast.fail('请选择支付方式')
+      // 拿到支付方式的id号
+      const payChecked = this.payModeList.find(item => item.isChecked)
+      try {
+        if (this.mode === 'cart') {
+          //  获取购物车商品修改的数量、
+          const cartQuantitys = this.orderList.map(item => ({ id: item.cart_id, quantity: item.quantity }))
+          await submitOrder(this.mode, { cartIds: this.cartIds, pay_mode_id: payChecked.id, quantitys: cartQuantitys })
+        }
+
+        if (this.mode === 'buyNow') {
+          await submitOrder(this.mode, { pay_mode_id: payChecked.id, quantity: this.orderList[0].quantity, goodsId: this.goodsId, specValueIds: this.specs })
+        }
+        // 再次调用，更新余额
+        await this.getPayModeList()
+        this.$toast.success('支付成功')
+        this.$router.replace('/myorder')
+      } catch (error) {
+        console.log('提交失败', error)
+      }
     }
   }
 }
@@ -276,6 +321,14 @@ export default {
   padding-bottom: 80px;
   small {
     font-size: 10px;
+  }
+  .arrows {
+    font-size: 16px;
+    color: #666;
+  }
+  .arrows2 {
+    font-size: 10px;
+    color: #666;
   }
   .box {
     background-color: #fff;
@@ -457,47 +510,36 @@ export default {
         }
         // border: 1px solid #000;
         .money-icon {
-          width: 24px;
-          height: 24px;
+          width: 22px;
+          height: 22px;
           margin-right: 6px;
           img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
+          }
+        }
+        .select {
+          &.red {
+            color: #ff5000;
           }
         }
       }
     }
   }
-  .bottom-bar {
+
+  .payNow-btn {
     width: 100%;
-    height: 50px;
+    height: 44px;
     position: fixed;
     bottom: 0;
     left: 0;
-    background-color: #fff;
-    border-top: 1px solid #d0c7c7;
-    z-index: 888;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 14px;
-    .payment {
-      margin-left: 12px;
-      span {
-        color: #ff5000;
-      }
-    }
-    .submit {
-      height: 90%;
-      width: 32%;
-      background: linear-gradient(to bottom right, #fa2a1f, #fe5630);
-      color: #fff;
-      line-height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    background-color: #ff5000;
+    color: #fff;
+    text-align: center;
+    line-height: 44px;
+    font-size: 16px;
+    font-weight: bold;
   }
 }
 </style>
