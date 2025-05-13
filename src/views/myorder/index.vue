@@ -7,10 +7,10 @@
       <div class="nav-scroll">
         <div class="nav-tabs">
           <div
-            v-for="(tab, index) in tabs"
+            v-for="(tab, index) in userIndexData.types"
             :key="index"
             :class="['tab-item', { active: activeIndex === index }]"
-            @click="switchTab(index)"
+            @click="switchTab(tab.type, index)"
           >
             <span class="tab-text">{{ tab.name }}</span>
             <span v-if="tab.count" class="count-badge">{{ tab.count }}</span>
@@ -18,30 +18,84 @@
         </div>
       </div>
     </div>
+    <div v-if="orderList.length > 0">
+      <OrderList
+        v-for="(item, index) in orderList"
+        :key="index"
+        :item="item"
+      ></OrderList>
+    </div>
+    <div v-else class="empty-goods">
+      <img src="@/assets/empty.png" alt="" />
+      <p>暂无商品信息</p>
+      <span @click="$router.push('/')">去逛逛!</span>
+    </div>
   </div>
 </template>
 
 <script>
 import TopTitle from '@/components/TopTitle.vue'
+import OrderList from '@/components/OrderListItem.vue'
+import { getOrderList } from '@/api/userInfo'
+import { mapState } from 'vuex'
 export default {
-  components: { TopTitle },
+  components: { TopTitle, OrderList },
   data () {
     return {
       activeIndex: 0,
-      tabs: [
-        { name: '全部', count: 0 },
-        { name: '待付款', count: 0 },
-        { name: '待发货', count: 0 },
-        { name: '待收货', count: 0 },
-        { name: '退款/售后', count: 0 },
-        { name: '待评价', count: 0 }
-      ]
+      orderList: [],
+      currentTabType: null, // 记录当前请求类型，防止相同标签重复请求
+      isRequesting: false // 状态锁防止快速切换不同标签时的连续请求
+    }
+  },
+  async created () {
+    await this.$store.dispatch('user/getUserIndex')
+    // 初始化加载
+    if (this.userIndexData.types?.length) {
+      const typesIndex = this.userIndexData.types.findIndex(
+        (item) => item.type === this.$route.query.type || 'all'
+      )
+      const initialTab = this.userIndexData.types[typesIndex]
+      this.activeIndex = typesIndex
+      this.currentTabType = initialTab.type
+      this.getData(initialTab.type)
+    }
+  },
+  computed: {
+    ...mapState('user', ['userIndexData']),
+    getQueryType () {
+      return this.$route.query.type
     }
   },
   methods: {
-    switchTab (index) {
-      this.activeIndex = index
-      // 这里可以添加页面内容切换逻辑
+    async switchTab (tab, index) {
+      // 拦截重复点击相同标签
+      if (this.activeIndex === index && this.currentTabType === tab.type) {
+        return
+      }
+      // 防止连续点击不同标签时的重复请求
+      if (this.isRequesting) return
+
+      try {
+        this.isRequesting = true
+        this.activeIndex = index
+        this.currentTabType = tab.type
+        await this.getData(tab)
+      } finally {
+        this.isRequesting = false
+      }
+    },
+
+    async getData (type) {
+      const { data } = await getOrderList(type)
+      this.orderList = data
+      // 处理回来的数据
+      data.forEach((item) => {
+        item.created_at = item[0]?.created_at
+        item.total_amount = item[0]?.total_amount
+        item.status = item[0]?.status
+        item.status_text = item[0]?.status_text
+      })
     }
   }
 }
@@ -113,5 +167,23 @@ export default {
       }
     }
   }
+}
+.empty-goods{
+  text-align: center;
+  margin-top: 50px;
+  font-size: 16px;
+  p{
+    margin-bottom: 4px;
+  }
+  img{
+    max-width: 160px;
+    margin-bottom: 10px;
+
+  }
+  span{
+    color: #666;
+    font-size: 14px;
+  }
+
 }
 </style>

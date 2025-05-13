@@ -1,0 +1,162 @@
+<template>
+  <div class="order-item">
+    <!-- 订单头部 -->
+    <div class="order-top">
+      <div class="text time">{{ item.created_at }}</div>
+      <div class="text status">{{ item.status_text }}</div>
+    </div>
+    <!-- 商品列表 -->
+    <div class="goods-item-top" v-for="(orders,index) in item" :key="index">
+      <!-- 图片 -->
+      <div class="goods-img">
+        <img :src="orders.color_image || orders.goods_coverImg" alt="goods-img" />
+      </div>
+      <!-- 标题 -->
+      <div class="goods-content">
+        <div class="goods-title">
+          <p>{{ orders.goods_title }}</p>
+        </div>
+
+        <!-- 规格 -->
+        <div class="goods-specs">{{ orders.color_name }};{{ orders.memory_name }}</div>
+      </div>
+
+      <!-- 价格  -->
+      <div class="price_add_count">
+        <div class="price">
+          <strong><span class="symbol">￥</span>{{ orders.pay_price }}</strong>
+        </div>
+        <div class="count">x{{ orders.quantity }}</div>
+      </div>
+    </div>
+
+    <div class="goods-item-foot">应付款<small>￥</small>{{ item.total_amount }}</div>
+
+    <div class="btn">
+      <span>删除订单</span>
+      <span>加入购物车</span>
+      <span class="active">查看订单</span>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  props: {
+    item: {
+      type: Array
+    }
+  },
+  data () {
+    return {
+
+    }
+  },
+  computed: {
+  },
+  methods: {
+
+  }
+}
+</script>
+
+<style lang="less" scoped>
+.order-item {
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  box-shadow: 0px 0px 20px 2px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  margin: 8px 8px 0px 8px;
+  .order-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 10px;
+    .time{
+      color: #666;
+      font-size: 12px;
+    }
+    .status{
+      font-size: 14px;
+          color: rgb(255, 80, 0);
+
+    }
+
+  }
+  .goods-item-top {
+    display: flex;
+    padding: 8px;
+    .goods-img {
+      width: 80px;
+      height: 80px;
+      // margin: 10px;
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+    }
+    .goods-content {
+      width: 220px;
+      padding: 10px 6px;
+      .goods-title,
+      .goods-specs {
+        margin-bottom: 10px;
+      }
+      .goods-title {
+        font-size: 14px;
+        color: #000;
+        // font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        //   Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+        //   sans-serifd;
+        display: -webkit-box; //设置元素为弹性盒子
+        -webkit-box-orient: vertical; //设置盒子的排列方式
+        -webkit-line-clamp: 1; //指定要显示的行数
+        overflow: hidden;
+      }
+      .goods-specs {
+        padding: 0 4px;
+        font-size: 12px;
+        color: #929292;
+        width: fit-content;
+        background-color: rgba(168, 166, 166, 0.1);
+      }
+    }
+    .price_add_count {
+      text-align: right;
+      padding: 10px 6px;
+      .price {
+        font-size: 14px;
+        color: #000000;
+        margin-bottom: 10px;
+        .symbol {
+          font-size: 10px;
+        }
+      }
+      .count {
+        font-size: 12px;
+      }
+    }
+  }
+  .goods-item-foot,
+  .btn {
+    text-align: right;
+    margin-right: 14px;
+    font-size: 13px;
+  }
+  .btn {
+    span {
+      display: inline-block;
+      padding: 4px 8px;
+      background-color: rgba(0, 0, 0, 0.1);
+      margin: 10px 0 20px 6px;
+      border-radius: 4px;
+    }
+    .active {
+      color: rgb(255, 80, 0);
+      background-color: rgba(255, 80, 0, 0.1);
+    }
+  }
+}
+</style>

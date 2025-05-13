@@ -8,13 +8,13 @@
       <div class="user-info">
         <div class="avatar">
           <img
-            :src="userInfoData.avatar || userInfoData.default_avatar"
+            :src="userData.avatar || defaultAvatar"
             alt="用户头像"
           />
         </div>
         <div class="info">
           <h2 class="username">
-            {{ userInfoData.nickname || userInfoData.mobile }}
+            {{ userData.nickname || userData.mobile }}
           </h2>
           <!-- <p class="vip-level">黄金会员</p> -->
         </div>
@@ -24,7 +24,7 @@
     <!-- 账户资产 -->
     <div class="assets-card">
       <div class="asset-item">
-        <div class="asset-value">¥ {{ userInfoData.balance }}</div>
+        <div class="asset-value">¥ {{ userData.balance }}</div>
         <div class="asset-label">账户余额</div>
       </div>
       <div class="asset-item">
@@ -42,34 +42,10 @@
         </div>
       </div>
       <div class="order-status">
-        <div class="status-item" @click="$router.push('/myorder?type=payment')">
-          <van-icon name="pending-payment" class="iconfont" />
-          <span>待付款</span>
-        </div>
-        <div
-          class="status-item"
-          @click="$router.push('/myorder?type=received')"
-        >
-          <van-icon name="failure" class="iconfont" />
-          <span>待收货</span>
-        </div>
-        <div
-          class="status-item"
-          @click="$router.push('/myorder?type=delivery')"
-        >
-          <van-icon name="logistics" class="iconfont" />
-          <span>待发货</span>
-        </div>
-        <div
-          class="status-item"
-          @click="$router.push('/myorder?type=evaluated')"
-        >
-          <van-icon name="records-o" class="iconfont" />
-          <span>待评价</span>
-        </div>
-        <div class="status-item" @click="$router.push('/myorder?type=refund')">
-          <van-icon name="notes-o" class="iconfont" />
-          <span>退款/售后</span>
+        <div class="status-item" v-for="item in filterData" :key="item.id" @click="$router.push(`/myorder?type=${item.type}`)">
+          <van-icon :name="item.state_icon
+" class="iconfont" />
+          <span>{{ item.name }}</span>
         </div>
       </div>
     </div>
@@ -110,32 +86,34 @@
 </template>
 
 <script>
-import { getUserInfo } from '@/api/userInfo'
 import TopTitle from '@/components/TopTitle.vue'
+import { mapState } from 'vuex'
 export default {
   name: 'myUser',
   components: { TopTitle },
   data () {
     return {
-      userInfoData: {}
+      defaultAvatar: require('@/assets/default-avatar.png')
     }
   },
-  created () {
+  async created () {
+    await this.$store.dispatch('user/getUserIndex')
     if (this.token) {
       // 发起请求
-      this.getUserInfoData()
+      await this.$store.dispatch('user/getUserData')
     }
   },
   computed: {
+    ...mapState('user', ['userData', 'userIndexData']),
     token () {
       return this.$store.getters.getToken
+    },
+    filterData () {
+      // 过滤掉all,并且限制循环次数为5次
+      return this.userIndexData?.types?.filter(item => item.type !== 'all')?.slice(0, 5) || []
     }
   },
   methods: {
-    async getUserInfoData () {
-      const { data } = await getUserInfo()
-      this.userInfoData = data
-    }
   }
 }
 </script>
