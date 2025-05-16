@@ -32,15 +32,22 @@
 
     <div class="goods-item-foot">应付款<small>￥</small>{{ item.total_amount }}</div>
 
-    <div class="btn">
-      <span>删除订单</span>
-      <span>加入购物车</span>
-      <span class="active">查看订单</span>
+    <div class="btn" v-if="item.status !== 'completed'">
+      <span v-if="item.status !== 'paid' && item.status !== 'shipped'" @click="onDelOrder(item)">删除订单</span>
+      <span v-if="item.status === 'pending' || item.status === 'cancelled'"  class="active" @click="onBuyNow(item)">立即付款</span>
+      <span v-else-if="item.status === 'shipped' || item.status === 'paid'"  class="active" @click="onCancelOrder(item)">申请取消</span>
+      <span v-else  class="active">确认收货</span>
+    </div>
+
+    <!-- 第二个按钮组（当条件为false时显示） -->
+    <div class="btn" v-else>
+      <span  class="active">待评价</span>
     </div>
   </div>
 </template>
 
 <script>
+import { updateCancelOrder, deleteOrderServer } from '@/api/userInfo'
 export default {
   props: {
     item: {
@@ -49,13 +56,87 @@ export default {
   },
   data () {
     return {
-
+      timerId: null
     }
   },
   computed: {
   },
   methods: {
+    onCancelOrder (item) {
+      try {
+        this.$modal.confirm({
+          title: '温馨提示',
+          message: '你确定要取消该订单吗？',
+          confirmButtonColor: '#ee0a24',
+          cancelBtnText: '取消',
+          confirmBtnText: '确定',
+          closerOnClickModal: false
+        })
+          .then(() => {
+            this.handleCancelOrder(item[0].order_id, 'cancel')
+          })
+          .catch(() => { })
+      } catch (err) {
+        this.$toast.error('申请失败！')
+      }
+    },
+    onBuyNow (item) {
+      // console.log(this.$route)
+      if (item[0].mode === 'buyNow') {
+        this.$router.push({
+          path: '/pay',
+          query: {
+            mode: item[0].mode,
+            goodsId: item[0].goods_id,
+            specs: JSON.stringify(item[0].specValueIds),
+            quantity: item[0].quantity
+          }
+        })
+      } else {
+        this.$router.push({
+          path: '/pay',
+          query: {
+            mode: item[0].mode,
+            cartIds: item.map(cart => cart.cart_id).join(',')
+          }
+        })
+      }
+    },
+    async onDelOrder (item) {
+      try {
+        this.$modal.confirm({
+          title: '温馨提示',
+          message: '你确定要删除该订单吗？',
+          confirmButtonColor: '#ee0a24',
+          cancelBtnText: '取消',
+          confirmBtnText: '确定',
+          closerOnClickModal: false
+        })
+          .then(() => {
+            this.handleCancelOrder(item[0].order_id, 'delete')
+          })
+          .catch(() => { })
+      } catch (err) {
+        this.$toast.error('申请失败！')
+      }
+    },
+    async handleCancelOrder (orderId, type) {
+      if (type === 'cancel') {
+        await updateCancelOrder(orderId)
+        this.$toast.success('申请成功！')
+      } else {
+        await deleteOrderServer(orderId)
+        this.$toast.success('删除成功！')
+      }
 
+      this.timerId = setTimeout(() => {
+        this.$emit('cancelSuccess')
+      }, 600)
+    }
+  },
+  destroyed () {
+    // 销毁定时器
+    clearTimeout(this.timerId)
   }
 }
 </script>

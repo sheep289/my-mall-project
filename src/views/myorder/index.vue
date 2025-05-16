@@ -23,6 +23,7 @@
         v-for="(item, index) in orderList"
         :key="index"
         :item="item"
+        @cancelSuccess="handleCancelSuccess"
       ></OrderList>
     </div>
     <div v-else class="empty-goods">
@@ -50,11 +51,11 @@ export default {
   },
   async created () {
     await this.$store.dispatch('user/getUserIndex')
-    // 初始化加载
     if (this.userIndexData.types?.length) {
-      const typesIndex = this.userIndexData.types.findIndex(
-        (item) => item.type === this.$route.query.type || 'all'
+      let typesIndex = this.userIndexData.types.findIndex(
+        (item) => item.type === this.$route.query.type
       )
+      typesIndex = typesIndex === -1 ? 0 : typesIndex
       const initialTab = this.userIndexData.types[typesIndex]
       this.activeIndex = typesIndex
       this.currentTabType = initialTab.type
@@ -96,6 +97,11 @@ export default {
         item.status = item[0]?.status
         item.status_text = item[0]?.status_text
       })
+    },
+    handleCancelSuccess () {
+      // 申请取消成功了 跳转到全部
+      this.activeIndex = 0
+      this.getData('all')
     }
   }
 }

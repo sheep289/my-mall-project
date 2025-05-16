@@ -15,3 +15,9 @@ export const getOrderList = (type) => {
     }
   })
 }
+
+// 取消订单
+export const updateCancelOrder = (orderId) => request.post('/my/order/cancel', { orderId })
+
+// 删除订单
+export const deleteOrderServer = (orderId) => request.post('/my/order/delete', { orderId })
