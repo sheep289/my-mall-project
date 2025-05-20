@@ -5,26 +5,33 @@
       <h3>商品搜索</h3>
     </TopTitle>
     <!-- 搜索框  -->
-    <div class="search-box">
+
+    <form class="search-box" @submit.prevent="submitForm(serachContent)">
       <van-icon name="search" class="icon" />
       <input
         type="text"
         class="inp"
         placeholder="请输入搜索关键词"
-        @click="$router.push('/search')"
+        v-model="serachContent"
       />
-      <div class="btn">
+      <button class="search-btn" type="submit">
         <span>搜索</span>
-      </div>
-    </div>
+      </button>
+    </form>
+
     <!-- 最近搜索 -->
     <div class="history">
       <span>最近搜索</span>
       <van-icon name="delete-o" class="del-icon" />
     </div>
     <div class="list">
-      <div class="list-item" v-for="item in 10" :key="item">
-        手机ddddddddddddd
+      <div
+        class="list-item"
+        v-for="(item, index) in serachHistory"
+        :key="index"
+        @click="submitForm(item)"
+      >
+        {{ item }}
       </div>
     </div>
   </div>
@@ -32,10 +39,32 @@
 
 <script>
 import TopTitle from '@/components/TopTitle.vue'
+import { getHistoryList, setHistoryList } from '@/utils/storage'
 export default {
   name: 'searchsIndex',
   components: {
     TopTitle
+  },
+  data () {
+    return {
+      serachContent: '',
+      serachHistory: getHistoryList() // 搜索历史记录
+    }
+  },
+  methods: {
+    submitForm (item) {
+      // 获取重复的索引号，没有重复为-1
+      const index = this.serachHistory.indexOf(item)
+      if (index !== -1) {
+        this.serachHistory.splice(index, 1)
+      }
+      // this.serachContent = item
+
+      // 将搜索的内容添加到搜索历史数组中
+      this.serachHistory.unshift(item)
+      setHistoryList(this.serachHistory)
+      // 跳转到搜索列表
+    }
   }
 }
 </script>
@@ -45,41 +74,65 @@ export default {
   .search-box {
     display: flex;
     background-color: #f1f1f2;
-    height: 40px;
-    border-radius: 5px;
+    height: 44px;
+    border-radius: 22px;
     margin: 60px 14px 12px 14px;
     overflow: hidden;
     align-items: center;
     position: relative;
-    justify-content: center;
+    border: 1px solid #eee;
+    transition: all 0.2s;
+
+    &:focus-within {
+      border-color: #ff5000;
+      box-shadow: 0 0 0 2px rgba(255, 80, 0, 0.1);
+    }
 
     .icon {
-      font-size: 16px;
-      padding: 10px 0;
-      margin-left: 20px;
+      font-size: 18px;
+      color: #999;
+      margin-left: 16px;
     }
     .inp {
       width: 100%;
       flex: 1;
-      background-color: transparent; /* 改为透明 */
-      background-color: #f1f1f1;
+      background-color: transparent;
       border: none;
-      margin-left: 10px;
-      font-size: 14px;
+      margin: 0 10px;
+      font-size: 15px;
+      color: #333;
+      outline: none;
+
+      &::placeholder {
+        color: #aaa;
+      }
     }
-    .btn {
-      width: 60px;
+    .search-btn {
+      width: 70px;
       height: 100%;
-      background-color: #c21401;
+      background-color: #ff5000;
+      color: white;
+      border: none;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: #e04800;
+      }
+
+      &:active {
+        background-color: #c04000;
+        transform: scale(0.98);
+      }
+
       span {
-        color: #fff;
-        line-height: 40px;
-        font-size: 16px;
+        display: inline-block;
+        transition: transform 0.2s;
       }
     }
   }
@@ -87,7 +140,6 @@ export default {
     display: flex;
     justify-content: space-between;
     margin: 18px 12px;
-
   }
   .list {
     display: flex;
