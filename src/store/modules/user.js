@@ -32,6 +32,14 @@ export default {
     async getUserIndex (context) {
       const { data } = await getUserIndexData()
       context.commit('setUserIndexData', data)
+    },
+    logout (context) {
+      // 清除token与用户信息
+      context.commit('setUserInfo', {})
+      context.commit('setUserData', {})
+      // 清除cart与address
+      context.commit('cart/setCartList', [], { root: true })
+      context.commit('address/setAddressList', [], { root: true })
     }
   },
   getters: {}

@@ -13,8 +13,11 @@
           />
         </div>
         <div class="info">
-          <h2 class="username">
+          <h2 class="username" v-if="token">
             {{ userData.nickname || userData.mobile }}
+          </h2>
+          <h2 class="username" @click="$router.push('/login')" v-else>
+            立即登录
           </h2>
           <!-- <p class="vip-level">黄金会员</p> -->
         </div>
@@ -24,11 +27,13 @@
     <!-- 账户资产 -->
     <div class="assets-card">
       <div class="asset-item">
-        <div class="asset-value">¥ {{ userData.balance }}</div>
+        <div class="asset-value" v-if="token">¥ {{ userData.balance }}</div>
+        <div class="asset-value" v-else>0.00</div>
         <div class="asset-label">账户余额</div>
       </div>
       <div class="asset-item">
-        <div class="asset-value">3 张</div>
+        <div class="asset-value" v-if="token">3 张</div>
+        <div class="asset-value" v-else>无</div>
         <div class="asset-label">优惠券</div>
       </div>
     </div>
@@ -56,7 +61,7 @@
         <h3>我的服务</h3>
       </div>
       <div class="service-grid">
-        <div class="service-item">
+        <div class="service-item" @click="$router.push('/address')">
           <van-icon name="location" class="iconfont" />
           <span>收货地址</span>
         </div>
@@ -79,8 +84,8 @@
       </div>
     </div>
     <!-- 退出登录 -->
-    <div class="logout-btn">
-      <button>退出登录</button>
+    <div class="logout-btn" v-show="token" >
+      <button @click="handleLogout">退出登录</button>
     </div>
   </div>
 </template>
@@ -114,6 +119,22 @@ export default {
     }
   },
   methods: {
+    handleLogout () {
+      this.$modal.confirm({
+        title: '温馨提示',
+        message: '你确定要退出登录吗？',
+        confirmButtonColor: '#ee0a24',
+        cancelBtnText: '取消',
+        confirmBtnText: '确定',
+        closerOnClickModal: false
+      })
+        .then(() => {
+          this.$store.dispatch('user/logout')
+
+          this.$emit('input', false) // 关闭底层弹框
+        })
+        .catch(() => { })
+    }
   }
 }
 </script>
@@ -138,7 +159,7 @@ export default {
     align-items: center;
     padding: 20px 15px;
     background: linear-gradient(
-      135deg,
+      307deg,
       @theme-color,
       lighten(@theme-color, 10%)
     );
