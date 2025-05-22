@@ -15,7 +15,7 @@
           value="手机"
         />
       </div>
-      <div class="cart-top-manage" @click="isEdit = !isEdit">
+      <div class="cart-top-manage" @click="isEdit = !isEdit" v-show="cartList.length > 0">
         {{ isEdit ? "管理" : "退出管理" }}
       </div>
     </div>

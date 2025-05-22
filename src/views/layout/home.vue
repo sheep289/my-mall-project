@@ -168,6 +168,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    padding: 0 4px;
   }
 }
 </style>

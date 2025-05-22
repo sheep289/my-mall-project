@@ -13,6 +13,7 @@
         class="inp"
         placeholder="请输入搜索关键词"
         v-model="serachContent"
+        ref="inpRef"
       />
       <button class="search-btn" type="submit">
         <span>搜索</span>
@@ -65,6 +66,19 @@ export default {
       serachHistory: getHistoryList(), // 搜索历史记录
       edit: true
     }
+  },
+  computed: {
+    keyword () {
+      return this.$route.query.keyword || ''
+    }
+  },
+  created () {
+    this.serachContent = this.keyword
+  },
+  mounted () {
+    this.$nextTick(() => {
+      this.$refs.inpRef.focus()
+    })
   },
   methods: {
     submitForm (item) {
@@ -125,7 +139,6 @@ export default {
     position: relative;
     border: 1px solid #eee;
     transition: all 0.2s;
-
     &:focus-within {
       border-color: #ff5000;
       box-shadow: 0 0 0 2px rgba(255, 80, 0, 0.1);
@@ -213,7 +226,7 @@ export default {
       white-space: nowrap;
       text-overflow: ellipsis; //使用省略号表示溢出
       margin-bottom: 10px;
-      border: 1px solid #a1a1a1;
+      border: 1px solid #d5d5d5;
       position: relative;
       .text-box {
         padding: 4px 8px;

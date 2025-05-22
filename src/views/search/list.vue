@@ -11,7 +11,7 @@
           type="text"
           class="inp"
           placeholder="搜索你要找的商品"
-          @click="$router.replace('/search')"
+          @click="$router.replace(`/search?keyword=${query.keyword}`)"
           :value="query.keyword"
         />
       </div>
@@ -20,10 +20,13 @@
     </div>
     <!-- 商品筛选 -->
     <div class="goods-filter-box">
-      <span class="goods-filter active">综合</span>
-      <span class="goods-filter">销量</span>
-      <span class="goods-filter">价格</span>
-      <span class="goods-filter">品牌</span>
+      <span
+        class="goods-filter"
+        @click="handleUtlisSort(item,index)"
+        v-for="(item, index) in utilsData"
+        :key="index"
+        :class="{active:activeIndex === index}"
+        >{{ item.name }}</span>
     </div>
     <!-- 商品卡片项 -->
     <div class="goods-item">
@@ -48,17 +51,51 @@ export default {
   },
   data () {
     return {
-      goodsList: []
+      goodsList: [],
+      activeIndex: 0,
+      editSort: true,
+      utilsData: [
+        { id: 1, name: '综合', type: 'composite' },
+        { id: 2, name: '销量', type: 'sales' },
+        { id: 3, name: '价格', type: 'price' },
+        { id: 4, name: '品牌', type: 'brand' }
+      ]
     }
   },
-  async created () {
-    const { data } = await getSearchList({ limit: this.query.limit || '', keyword: this.query.keyword || '', categoryId: this.query.categoryId || '' })
-    this.goodsList = data
-    console.log(this.goodsList)
+  created () {
+    this.getGoodsList()
   },
   computed: {
     query () {
       return this.$route.query
+    }
+  },
+  methods: {
+    async getGoodsList () {
+      const { data } = await getSearchList({
+        limit: this.query.limit || '',
+        keyword: this.query.keyword || '',
+        categoryId: this.query.categoryId || ''
+      })
+      this.goodsList = data
+    },
+    handleUtlisSort (item, index) {
+      this.activeIndex = index
+      if (item.name === '销量') {
+        this.goodsList.sort((a, b) => b.sales - a.sales)
+      } else if (item.name === '价格') {
+        // this.goodsList.sort((a, b) => a.price_min - b.price_min)
+        if (this.activeIndex === index) {
+          this.editSort = !this.editSort
+        }
+        if (this.editSort) {
+          this.goodsList.sort((a, b) => b.price_min - a.price_min)
+        } else {
+          this.goodsList.sort((a, b) => a.price_min - b.price_min)
+        }
+      } else {
+        this.getGoodsList()
+      }
     }
   }
 }
@@ -68,7 +105,7 @@ export default {
 .search-list {
   .top {
     display: flex;
-    height: 70px;
+    height: 60px;
     align-items: center;
     justify-content: space-between;
     .search {
@@ -78,6 +115,9 @@ export default {
       margin: 16px 14px 12px 16px;
       overflow: hidden;
       align-items: center;
+      height: 34px;
+      font-size: 13px;
+      color: #666;
       flex: 1;
       border: 1px solid #aca9a9;
       .icon {
@@ -93,15 +133,18 @@ export default {
       }
     }
     .icon-filter {
-      font-size: 30px;
+      font-size: 24px;
       margin-right: 12px;
     }
   }
   .goods-filter-box {
-    padding: 20px 0;
+    padding: 12px 0;
     display: flex;
     text-align: center;
     border-bottom: 1px solid #d0c7c7;
+    font-size: 14px;
+      margin-bottom: 8px;
+
     .goods-filter {
       flex: 1;
     }
@@ -113,6 +156,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
     gap: 8px; // 关键：用gap替代margin控制间距
+    padding: 0 4px;
   }
 }
 </style>
