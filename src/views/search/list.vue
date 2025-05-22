@@ -11,8 +11,8 @@
           type="text"
           class="inp"
           placeholder="搜索你要找的商品"
-          @click="$router.push('/search')"
-          value="手机"
+          @click="$router.replace('/search')"
+          :value="query.keyword"
         />
       </div>
       <!-- 筛选 -->
@@ -26,8 +26,12 @@
       <span class="goods-filter">品牌</span>
     </div>
     <!-- 商品卡片项 -->
-    <div class="list">
-      <GoodsItem v-for="item in 9" :key="item"></GoodsItem>
+    <div class="goods-item">
+      <GoodsItem
+        v-for="item in goodsList"
+        :key="item.id"
+        :item="item"
+      ></GoodsItem>
     </div>
   </div>
 </template>
@@ -35,11 +39,27 @@
 <script>
 import GoodsItem from '@/components/GoodsItem.vue'
 import TopTitle from '@/components/TopTitle.vue'
+import { getSearchList } from '@/api/search'
 export default {
   name: 'searchListIndex',
   components: {
     GoodsItem,
     TopTitle
+  },
+  data () {
+    return {
+      goodsList: []
+    }
+  },
+  async created () {
+    const { data } = await getSearchList({ limit: this.query.limit || '', keyword: this.query.keyword || '', categoryId: this.query.categoryId || '' })
+    this.goodsList = data
+    console.log(this.goodsList)
+  },
+  computed: {
+    query () {
+      return this.$route.query
+    }
   }
 }
 </script>
@@ -89,11 +109,10 @@ export default {
       color: red;
     }
   }
-  .list {
+  .goods-item {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
-    align-content: flex-start;
+    gap: 8px; // 关键：用gap替代margin控制间距
   }
 }
 </style>

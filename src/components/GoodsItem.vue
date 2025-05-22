@@ -35,9 +35,9 @@ export default {
 
 <style lang="less" scoped>
 .goods-item {
-  flex: 1;
-  min-width: calc(50% - 8px); //确保一行两个，考虑间距
-  margin: 4px;
+   width: calc(50% - 4px); // 核心修正：强制宽度计算
+  flex: none !important; // 禁用flex扩展
+  margin: 0;
   background: #fff;
   border-radius: 8px;
   overflow: hidden;

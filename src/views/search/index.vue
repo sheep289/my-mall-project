@@ -85,9 +85,11 @@ export default {
         this.serachHistory.splice(index, 1)
       }
       // 将搜索的内容添加到搜索历史数组中
+      this.serachContent = item
       this.serachHistory.unshift(item)
       setHistoryList(this.serachHistory)
       // 跳转到搜索列表
+      this.$router.push(`/searchList?keyword=${this.serachContent}`)
     },
     onDelAll () {
       this.$modal
