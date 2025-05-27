@@ -12,7 +12,8 @@
             v-model="form.title"
             class="form-input"
             placeholder="请输入商品名称"
-            required>
+            required
+          />
         </div>
 
         <div class="form-group">
@@ -26,7 +27,8 @@
               min="0"
               step="0.01"
               placeholder="0.00"
-              required>
+              required
+            />
             <span class="unit">¥</span>
           </div>
         </div>
@@ -35,34 +37,49 @@
         <div class="form-group">
           <label class="form-label">商品规格</label>
           <div class="specs-container">
-            <div v-for="(spec, index) in form.specs" :key="index" class="spec-item">
+            <div
+              v-for="(spec, index) in form.specs"
+              :key="index"
+              class="spec-item"
+            >
               <div class="spec-inputs">
                 <input
                   type="text"
                   v-model="spec.name"
                   class="form-input spec-name"
                   placeholder="规格名称"
-                  required>
+                  required
+                />
                 <input
                   type="text"
                   v-model="spec.value"
                   class="form-input spec-value"
                   placeholder="规格值"
-                  required>
-                  <input
+                  required
+                />
+                <input
                   type="text"
                   v-model="spec.price"
                   class="form-input spec-value"
                   placeholder="价格"
-                  required>
+                  required
+                />
+                <input
+                  type="text"
+                  v-model="spec.stock"
+                  class="form-input spec-value"
+                  placeholder="库存"
+                  required
+                />
               </div>
               <van-icon
                 name="delete"
                 class="delete-icon"
-                @click="removeSpec(index)"/>
+                @click="removeSpec(index)"
+              />
             </div>
             <button type="button" class="add-spec-btn" @click="addSpec">
-              <van-icon name="plus" class="add-icon"/>
+              <van-icon name="plus" class="add-icon" />
               <span>添加规格</span>
             </button>
           </div>
@@ -76,7 +93,8 @@
             class="form-textarea"
             placeholder="详细描述商品特性、功能等信息"
             rows="4"
-            required></textarea>
+            required
+          ></textarea>
         </div>
 
         <!-- 主图上传 -->
@@ -89,15 +107,20 @@
                 @change="handleMainImageUpload"
                 accept="image/*"
                 class="file-input"
-                required>
+                required
+              />
               <div v-if="!form.mainImage" class="upload-placeholder">
-                <van-icon name="photograph" class="upload-icon"/>
+                <van-icon name="photograph" class="upload-icon" />
                 <p>点击上传主图</p>
               </div>
               <div v-else class="image-preview">
-                <img :src="form.mainImagePreview" alt="主图预览">
-                <button type="button" class="remove-btn" @click.stop="removeImage('mainImage')">
-                  <van-icon name="clear" class="remove-icon"/>
+                <img :src="form.mainImagePreview" alt="主图预览" />
+                <button
+                  type="button"
+                  class="remove-btn"
+                  @click.stop="removeImage('mainImage')"
+                >
+                  <van-icon name="clear" class="remove-icon" />
                 </button>
               </div>
             </label>
@@ -108,22 +131,37 @@
         <div class="form-group">
           <label class="form-label">商品详情图</label>
           <div class="image-uploader">
-            <label class="upload-area" :class="{ 'has-image': form.detailImages.length > 0 }">
+            <label
+              class="upload-area"
+              :class="{ 'has-image': form.detailImages.length > 0 }"
+            >
               <input
                 type="file"
                 @change="handleDetailImagesUpload"
                 accept="image/*"
                 multiple
-                class="file-input">
-              <div v-if="form.detailImages.length === 0" class="upload-placeholder">
-                <van-icon name="photo" class="upload-icon"/>
+                class="file-input"
+              />
+              <div
+                v-if="form.detailImages.length === 0"
+                class="upload-placeholder"
+              >
+                <van-icon name="photo" class="upload-icon" />
                 <p>点击上传详情图（可多选）</p>
               </div>
               <div v-else class="multi-image-preview">
-                <div v-for="(image, index) in form.detailImages" :key="index" class="preview-item">
-                  <img :src="image.preview" :alt="'详情图预览-' + index">
-                  <button type="button" class="remove-btn" @click.stop="removeDetailImage(index)">
-                    <van-icon name="clear" class="remove-icon"/>
+                <div
+                  v-for="(image, index) in form.detailImages"
+                  :key="index"
+                  class="preview-item"
+                >
+                  <img :src="image.preview" :alt="'详情图预览-' + index" />
+                  <button
+                    type="button"
+                    class="remove-btn"
+                    @click.stop="removeDetailImage(index)"
+                  >
+                    <van-icon name="clear" class="remove-icon" />
                   </button>
                 </div>
               </div>
@@ -135,22 +173,37 @@
         <div class="form-group">
           <label class="form-label">商品详情页图</label>
           <div class="image-uploader">
-            <label class="upload-area" :class="{ 'has-image': form.pageImages.length > 0 }">
+            <label
+              class="upload-area"
+              :class="{ 'has-image': form.pageImages.length > 0 }"
+            >
               <input
                 type="file"
                 @change="handlePageImagesUpload"
                 accept="image/*"
                 multiple
-                class="file-input">
-              <div v-if="form.pageImages.length === 0" class="upload-placeholder">
-                <van-icon name="photo-o" class="upload-icon"/>
+                class="file-input"
+              />
+              <div
+                v-if="form.pageImages.length === 0"
+                class="upload-placeholder"
+              >
+                <van-icon name="photo-o" class="upload-icon" />
                 <p>点击上传详情页图（可多选）</p>
               </div>
               <div v-else class="multi-image-preview">
-                <div v-for="(image, index) in form.pageImages" :key="index" class="preview-item">
-                  <img :src="image.preview" :alt="'详情页图预览-' + index">
-                  <button type="button" class="remove-btn" @click.stop="removePageImage(index)">
-                    <van-icon name="clear" class="remove-icon"/>
+                <div
+                  v-for="(image, index) in form.pageImages"
+                  :key="index"
+                  class="preview-item"
+                >
+                  <img :src="image.preview" :alt="'详情页图预览-' + index" />
+                  <button
+                    type="button"
+                    class="remove-btn"
+                    @click.stop="removePageImage(index)"
+                  >
+                    <van-icon name="clear" class="remove-icon" />
                   </button>
                 </div>
               </div>
@@ -165,15 +218,18 @@
             id="category"
             v-model="form.categoryId"
             class="form-select"
-            required>
+            required
+          >
             <option value="" disabled selected>请选择分类</option>
-            <option v-for="cat in categoryList" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+            <option v-for="cat in categoryList" :key="cat.id" :value="cat.id">
+              {{ cat.name }}
+            </option>
           </select>
         </div>
 
         <button type="submit" class="submit-btn">
           <span>提交商品</span>
-          <van-icon name="arrow" class="submit-icon"/>
+          <van-icon name="arrow" class="submit-icon" />
         </button>
       </form>
     </div>
@@ -182,9 +238,9 @@
 
 <script>
 import { mapState } from 'vuex'
+import { submitGoodsServer } from '@/api/goods'
 export default {
-  components: {
-  },
+  components: {},
   data () {
     return {
       form: {
@@ -192,9 +248,7 @@ export default {
         price: null, // 商品价格
         description: '', // 商品描述
         // 商品规格
-        specs: [
-          { name: '', value: '', price: '' }
-        ],
+        specs: [{ name: '', value: '', price: '', stock: '' }],
         mainImage: null, // 主图
         mainImagePreview: '', // 主图预览URL
         detailImages: [], // { file: File, preview: URL }  商品详情图
@@ -213,7 +267,7 @@ export default {
   methods: {
     // 添加规格
     addSpec () {
-      this.form.specs.push({ name: '', value: '' })
+      this.form.specs.push({ name: '', value: '', price: '', stock: '' })
     },
 
     // 移除规格
@@ -236,7 +290,7 @@ export default {
     handleDetailImagesUpload (event) {
       const files = event.target.files
       if (files.length > 0) {
-        Array.from(files).forEach(file => {
+        Array.from(files).forEach((file) => {
           this.form.detailImages.push({
             file: file,
             preview: URL.createObjectURL(file)
@@ -249,7 +303,7 @@ export default {
     handlePageImagesUpload (event) {
       const files = event.target.files
       if (files.length > 0) {
-        Array.from(files).forEach(file => {
+        Array.from(files).forEach((file) => {
           this.form.pageImages.push({
             file: file,
             preview: URL.createObjectURL(file)
@@ -279,25 +333,57 @@ export default {
       this.form.pageImages.splice(index, 1)
     },
 
-    submitForm () {
-      console.log('提交表单:', this.form)
-      // 这里添加API调用逻辑  实际提交时需要将预览URL转换为实际文件
-    }
-  },
+    async submitForm () {
+      try {
+        const formData = new FormData()
 
-  beforeUnmount () {
-    // 清理对象URL防止内存泄漏
-    if (this.form.mainImagePreview) {
-      URL.revokeObjectURL(this.form.mainImagePreview)
+        // 添加文件类字段
+        if (this.form.mainImage) {
+          formData.append('mainImage', this.form.mainImage)
+        }
+
+        this.form.detailImages.forEach((img) => {
+          formData.append('detailImages', img.file)
+        })
+
+        this.form.pageImages.forEach((img) => {
+          formData.append('pageImages', img.file)
+        })
+
+        // 添加非文件字段
+        Object.entries(this.form).forEach(([key, value]) => {
+          if (!['mainImage', 'detailImages', 'pageImages'].includes(key)) {
+            formData.append(
+              key,
+              typeof value === 'object' ? JSON.stringify(value) : value
+            )
+          }
+        })
+
+        // 提交请求
+        // await axios.post('/api/goods', formData)
+        await submitGoodsServer(formData)
+        // this.$message.success('商品添加成功！')
+        // 成功后的清理
+        this.cleanupMemory()
+      } catch (error) {
+        console.error('提交失败', error)
+      }
+    },
+    cleanupMemory () {
+      // 清理对象URL防止内存泄漏
+      if (this.form.mainImagePreview) {
+        URL.revokeObjectURL(this.form.mainImagePreview)
+      }
+      this.form.detailImages.forEach((img) => URL.revokeObjectURL(img.preview))
+      this.form.pageImages.forEach((img) => URL.revokeObjectURL(img.preview))
     }
-    this.form.detailImages.forEach(img => URL.revokeObjectURL(img.preview))
-    this.form.pageImages.forEach(img => URL.revokeObjectURL(img.preview))
   }
 }
 </script>
 
 <style lang="less" scoped>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap");
 
 .add-goods-container {
   display: flex;
@@ -306,7 +392,7 @@ export default {
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   padding: 20px;
-  font-family: 'Noto Sans SC', sans-serif;
+  font-family: "Noto Sans SC", sans-serif;
 }
 
 .form-card {
@@ -332,7 +418,7 @@ export default {
   position: relative;
 
   &::after {
-    content: '';
+    content: "";
     display: block;
     width: 60px;
     height: 3px;
@@ -358,7 +444,9 @@ export default {
   color: #555;
 }
 
-.form-input, .form-textarea, .form-select {
+.form-input,
+.form-textarea,
+.form-select {
   width: 100%;
   padding: 12px 15px;
   border: 1px solid #e0e0e0;
