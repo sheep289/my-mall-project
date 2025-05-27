@@ -1,5 +1,5 @@
 <template>
-  <div class="prodetail"  v-if="detail.title">
+  <div class="prodetail" v-if="detail.title">
     <!-- 标题 -->
     <TopTitle>
       <h3>商品详情页</h3>
@@ -90,8 +90,13 @@
     </div>
 
     <!-- 2.6商品详情  尺寸：宽度100%，高度自适应/建议高度 <= 1200px-->
-    <div class="goods-detail-img">
-      <img :src="detail.detail_page_images" alt="" />
+    <div class="goods-detail-img" v-if="detail.detail_page_combined">
+      <img
+        v-for="(img, index) in detail.detail_page_combined.split('||')"
+        :key="index"
+        :src="img"
+        style="width: 100%; display: block"
+      />
     </div>
 
     <!-- 3.底部tab栏功能 -->

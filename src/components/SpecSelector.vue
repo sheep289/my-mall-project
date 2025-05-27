@@ -4,12 +4,12 @@
     <div class="goods-card">
       <div class="goods-img">
         <img
-          :src="
-            goodsImg[0].color_image_url[activeIndex['1']] ||
-            detail.detail_images[0]
-          "
-          alt="img"
-        />
+  :src="
+    (goodsImg.color_image_url[activeIndex['1']] || '') ||
+    (detail.detail_images && detail.detail_images[0])
+  "
+  alt="img"
+/>
       </div>
 
       <div class="goods-content">
@@ -79,43 +79,53 @@ export default {
     }
   },
   created () {
-    // 初始化每个规格的默认选中状态（第一个选项）
-    // 利用循环每次循环将每个对象里面的specs_id 在 activeIndices 对象中动态添加属性名，值为0
-    this.specs.forEach(item => {
-      this.$set(this.activeIndex, item.specs_id, 0)
+  // 添加数据验证
+    this.$nextTick(() => {
+      if (!this.specs || this.specs.length === 0) {
+        console.warn('规格数据未加载完成')
+        return
+      }
+
+      this.specs.forEach(item => {
+        if (!Object.prototype.hasOwnProperty.call(this.activeIndex, item.specs_id)) {
+          this.$set(this.activeIndex, item.specs_id, 0)
+        }
+      })
     })
   },
   computed: {
     ...mapState('detail', ['specs', 'detail']),
     // 商品图片
     goodsImg () {
-      return this.specs.filter(item => item.specs_id === 1)
+      // 完全保护式访问
+      if (!this.specs || this.specs.length === 0) return { color_image_url: [] }
+
+      const firstSpec = this.specs[0]
+      return {
+        color_image_url: firstSpec.color_image_url || [],
+        values: firstSpec.values || []
+      }
     },
     // 动态计算商品价格与库存
     selectedPriceAndStock () {
-      let maxPrice = 0
-      let maxStock = Infinity
+    // 默认值处理
+      const defaultData = {
+        price: this.detail?.price_min || 0,
+        stock: this.detail?.stock || 0
+      }
 
-      this.specs.forEach(spec => {
-        // 获取当前规格的选中项索引
-        const selectedIndex = this.activeIndex[spec.specs_id]
-        // 获取选中项完整数据
-        const selectedValue = spec.values[selectedIndex]
-
-        if (selectedValue) {
-          maxPrice = Math.max(maxPrice, selectedValue.price || 0)
-          // 库存取最小值（按木桶原理，以最低库存为准）
-          if (selectedValue.stock !== undefined) {
-            maxStock = Math.min(maxStock, selectedValue.stock)
+      // 如果有选中的规格，则使用规格的价格和库存
+      if (this.specs.length > 0) {
+        for (const spec of this.specs) {
+          const selectedIndex = this.activeIndex[spec.specs_id] || 0
+          if (spec.values[selectedIndex]) {
+            defaultData.price = spec.values[selectedIndex].price
+            defaultData.stock = spec.values[selectedIndex].stock
           }
         }
-      })
-
-      // 保留原始数据的兜底值
-      return {
-        price: maxPrice || this.detail.price_max,
-        stock: Number.isFinite(maxStock) ? maxStock : this.detail.stock
       }
+
+      return defaultData
     },
     // 获取选中的规格id(后端接收数据为：{color: id,memory:id})
     selectSpecsIds () {
@@ -134,7 +144,10 @@ export default {
             break
         }
       })
-      return results
+      return {
+        price: this.detail?.price_min || 0,
+        stock: this.detail?.stock || 0
+      }
     }
   },
   methods: {
