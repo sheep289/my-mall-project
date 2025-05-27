@@ -12,6 +12,7 @@ import Register from '@/views/login/register.vue'
 import Address from '@/views/address'
 import CreateAddress from '@/views/address/createAddress.vue'
 import Update from '@/views/address/update.vue'
+import AddGoods from '@/views/addGoods'
 
 // 二级路由
 import Home from '@/views/layout/home.vue'
@@ -53,7 +54,8 @@ const router = new VueRouter({
       component: Address
     },
     { path: '/create', component: CreateAddress },
-    { path: '/update', component: Update }
+    { path: '/update', component: Update },
+    { path: '/addGoods', component: AddGoods }
   ]
 })
 

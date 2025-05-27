@@ -58,21 +58,24 @@
 </template>
 
 <script>
-import { getCategoryList, getProductsList } from '@/api/search'
+import { getProductsList } from '@/api/search'
+import { mapState } from 'vuex'
 export default {
   data () {
     return {
       activeIndex: 0,
-      categoryList: [],
+      // categoryList: [],
       products: []
     }
   },
   async created () {
-    const { data } = await getCategoryList()
-    this.categoryList = data
+    // const { data } = await getCategoryList()
+    // this.categoryList = data
+    await this.$store.dispatch('goods/getCategoryList')
     await this.getProductsData('手机')
   },
   computed: {
+    ...mapState('goods', ['categoryList']),
     currentCategory () {
       return this.categoryList[this.activeIndex]
     },

@@ -77,6 +77,10 @@
           <van-icon name="question" class="iconfont" />
           <span>我的帮助</span>
         </div>
+        <div class="service-item" @click="$router.push('/addgoods')">
+          <van-icon name="service" class="iconfont" />
+          <span>添加商品</span>
+        </div>
         <div class="service-item">
           <van-icon name="setting" class="iconfont" />
           <span>设置</span>
