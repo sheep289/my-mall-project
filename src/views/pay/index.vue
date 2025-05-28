@@ -58,7 +58,7 @@
 
             <!-- 规格 -->
             <div class="goods-specs">
-              {{ item.color_name }} ; {{ item.memory_name }}
+              {{ item.value }}
             </div>
 
             <!-- 价格  -->
@@ -202,7 +202,7 @@ export default {
       return this.$route.query.goodsId
     },
     specs () {
-      return this.$route.query.specs ? JSON.parse(this.$route.query.specs) : {}
+      return this.$route.query.specs ? this.$route.query.specs.split(',').map(Number) : []
     },
     // 立即购买的数量
     quantity () {
@@ -230,6 +230,7 @@ export default {
           const { data } = await getChekoutOrderData(this.mode, { cartIds: this.cartIds })
           data.forEach(item => {
             item.price = parseFloat(item.price)
+            item.value = item.value.join(' / ')
           })
           this.orderList = data
         }
@@ -241,6 +242,7 @@ export default {
           })
           data.forEach(item => {
             item.price = parseFloat(item.price)
+            item.value = item.value.join(' / ')
           })
           this.orderList = data
         }

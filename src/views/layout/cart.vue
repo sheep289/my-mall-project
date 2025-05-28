@@ -46,7 +46,7 @@
               </p>
             </div>
             <div class="goods-specs">
-              {{ item.color_name }} ; {{ item.memory_name }}
+              {{ item.value }}
             </div>
             <div class="price_add_count">
               <div class="price">

@@ -27,6 +27,7 @@ export default {
       // 给每一项添加一个 isChecked 状态 （标记当前商品是否选中 ）
       data.forEach(item => {
         item.isChecked = false
+        item.value = item.value.join(' / ')
       })
       context.commit('setCartList', data)
     },

@@ -79,7 +79,7 @@ export default {
     }
   },
   created () {
-  // 添加数据验证
+    // 添加数据验证
     this.$nextTick(() => {
       if (!this.specs || this.specs.length === 0) {
         console.warn('规格数据未加载完成')
@@ -97,7 +97,6 @@ export default {
     ...mapState('detail', ['specs', 'detail']),
     // 商品图片
     goodsImg () {
-      // 完全保护式访问
       if (!this.specs || this.specs.length === 0) return { color_image_url: [] }
 
       const firstSpec = this.specs[0]
@@ -127,27 +126,21 @@ export default {
 
       return defaultData
     },
-    // 获取选中的规格id(后端接收数据为：{color: id,memory:id})
+    // 获取选中的规格id(后端接收数据为：[选项1的id, 选项2的id, ...])
     selectSpecsIds () {
-      const results = {}
+      const results = []
+
       this.specs.forEach((spec) => {
         const selectedIndex = this.activeIndex[spec.specs_id]
         const selectedValue = spec.values[selectedIndex]
-
-        // 根据规格名称动态匹配字段
-        switch (spec.name) {
-          case '颜色':
-            results.color = selectedValue?.id || null
-            break
-          case '内存':
-            results.memory = selectedValue?.id || null
-            break
+        if (selectedValue) {
+          results.push(selectedValue.id)
+        } else {
+          results.push(null)
         }
       })
-      return {
-        price: this.detail?.price_min || 0,
-        stock: this.detail?.stock || 0
-      }
+
+      return results
     }
   },
   methods: {

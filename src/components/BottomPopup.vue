@@ -92,7 +92,7 @@ export default {
         query: {
           mode: 'buyNow',
           goodsId: this.goodsId,
-          specs: JSON.stringify(this.specParam.selectSpecsIds),
+          specs: this.specParam.selectSpecsIds.join(','),
           quantity: this.specParam.count
         }
 
