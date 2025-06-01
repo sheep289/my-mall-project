@@ -96,6 +96,9 @@ export default {
         item.total_amount = item[0]?.total_amount
         item.status = item[0]?.status
         item.status_text = item[0]?.status_text
+        item.forEach(specs => {
+          specs.value = specs?.value.join(' / ')
+        })
       })
     },
     handleCancelSuccess () {

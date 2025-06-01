@@ -298,7 +298,12 @@ export default {
       try {
         if (this.mode === 'cart') {
           //  获取购物车商品修改的数量、
+
           const cartQuantitys = this.orderList.map(item => ({ id: item.cart_id, quantity: item.quantity }))
+          console.log(this.orderList)
+
+          console.log(cartQuantitys)
+
           await submitOrder(this.mode, { cartIds: this.cartIds, pay_mode_id: payChecked.id, quantitys: cartQuantitys })
         }
 

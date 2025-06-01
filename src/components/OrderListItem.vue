@@ -18,7 +18,7 @@
         </div>
 
         <!-- 规格 -->
-        <div class="goods-specs">{{ orders.color_name }};{{ orders.memory_name }}</div>
+        <div class="goods-specs">{{ orders.value}}</div>
       </div>
 
       <!-- 价格  -->
@@ -88,7 +88,7 @@ export default {
           query: {
             mode: item[0].mode,
             goodsId: item[0].goods_id,
-            specs: JSON.stringify(item[0].specValueIds),
+            specs: item[0].specValueIds.join(','),
             quantity: item[0].quantity
           }
         })
