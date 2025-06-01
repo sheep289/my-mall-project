@@ -1,13 +1,18 @@
 <template>
-  <div class="swipe">
-    <img
-      v-for="(item, index) in list"
-      :key="index"
-      :src="item"
-      alt="swipe"
-      class="swipe-img"
-      :class="{ active: activeIndex === index }"
-    />
+  <div class="swipe-container"
+       @touchstart="handleTouchStart"
+       @touchmove="handleTouchMove"
+       @touchend="handleTouchEnd">
+    <div class="swipe-wrapper">
+      <img
+        v-for="(item, index) in list"
+        :key="index"
+        :src="item"
+        alt="swipe"
+        class="swipe-img"
+        :class="{ active: activeIndex === index }"
+      />
+    </div>
     <!-- 图片页码 -->
     <div class="page-num">{{ activeIndex + 1 }} / {{ list.length }}</div>
   </div>
@@ -18,7 +23,10 @@ export default {
   data () {
     return {
       activeIndex: 0,
-      timerId: null
+      timerId: null,
+      touchStartX: 0,
+      touchMoveX: 0,
+      isDragging: false
     }
   },
   props: {
@@ -28,44 +36,81 @@ export default {
       default: () => []
     }
   },
-  //   模版渲染之后 自动轮播
   mounted () {
     this.startAutoPlay()
   },
-  //   销毁定时器
   beforeDestroy () {
     clearInterval(this.timerId)
   },
   methods: {
     next () {
-      this.activeIndex = this.activeIndex >= this.list.length - 1 ? 0 : this.activeIndex + 1
+      this.activeIndex = (this.activeIndex + 1) % this.list.length
+    },
+    prev () {
+      this.activeIndex = (this.activeIndex - 1 + this.list.length) % this.list.length
     },
     startAutoPlay () {
       this.timerId = setInterval(() => {
         this.next()
       }, 3000)
+    },
+    stopAutoPlay () {
+      clearInterval(this.timerId)
+    },
+    handleTouchStart (e) {
+      this.stopAutoPlay()
+      this.touchStartX = e.touches[0].clientX
+      this.isDragging = true
+    },
+    handleTouchMove (e) {
+      if (!this.isDragging) return
+      this.touchMoveX = e.touches[0].clientX - this.touchStartX
+    },
+    handleTouchEnd () {
+      this.isDragging = false
+
+      // 滑动距离超过50px才切换
+      if (Math.abs(this.touchMoveX) > 50) {
+        this.touchMoveX > 0 ? this.prev() : this.next()
+      }
+
+      this.touchMoveX = 0
+      this.startAutoPlay()
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-.swipe {
+.swipe-container {
   margin-top: 55px;
   width: 100%;
   height: 375px;
-  overflow: hidden;
   position: relative;
-  padding: 12px 0;
+  overflow: hidden;
+  touch-action: pan-y;
+
+  .swipe-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
   .swipe-img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+
+    &.active {
+      opacity: 1;
+    }
   }
-  .swipe-img.active {
-    display: block;
-  }
+
   .page-num {
     width: 15%;
     padding: 4px 0;
@@ -74,9 +119,10 @@ export default {
     text-align: center;
     position: absolute;
     right: 0;
-    top: 0px;
+    top: 0;
     margin: 12px 6px 0 0;
     white-space: nowrap;
+    z-index: 10;
   }
 }
-</style>
+</style>s

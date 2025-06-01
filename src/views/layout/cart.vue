@@ -51,7 +51,7 @@
             <div class="price_add_count">
               <div class="price">
                 <!-- <span class="small">券后</span> -->
-                <strong><span class="symbol">￥</span>{{ item.price }}</strong>
+                <strong><span class="symbol">￥</span>{{ item.price.toFixed(2) }}</strong>
                 <!-- <del class="small">￥10000.00></del> -->
               </div>
               <!-- 商品数量 -->
@@ -72,7 +72,7 @@
           全选
         </div>
         <div class="all-price" v-show="isEdit">
-          合计：￥<span>{{ selTotalPrice }}</span>
+          合计：￥<span>{{ selTotalPrice.toFixed(2) }}</span>
         </div>
         <div
           class="goPay-btn"

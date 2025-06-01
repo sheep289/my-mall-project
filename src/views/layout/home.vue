@@ -14,7 +14,7 @@
     <Swiper :items="bannerList"></Swiper>
     <!-- 导航栏 -->
     <div class="nav-bar">
-      <div class="nav-list" v-for="(item, index) in navbarList" :key="index">
+      <div class="nav-list" v-for="(item, index) in navbarList" :key="index" @click="$router.push('/category')">
         <div class="icon-img">
           <img :src="item.icon_url" alt="icon" />
         </div>
@@ -123,22 +123,25 @@ export default {
     margin: 12px 0;
     background-color: #fff;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; // Firefox
+    &::-webkit-scrollbar { display: none; } // Chrome
 
     .nav-list {
-      width: 75px;
-      margin: 8px;
-      font-size: 14px;
+      min-width: 60px; // 调小宽度
+      margin: 6px 6px 6px 0; // 缩小间距
+      font-size: 13px; // 缩小字体
       color: #666;
       display: flex;
       flex-direction: column;
       align-items: center;
 
       .icon-img {
-        width: 40px;
-        height: 40px;
-        margin-bottom: 4px;
+        width: 32px; // 缩小图标
+        height: 32px;
+        margin-bottom: 2px;
 
         img {
           width: 100%;
@@ -149,11 +152,11 @@ export default {
       span {
         text-align: center;
         display: inline-block;
-        min-width: 40px;
-        line-height: 1.3;
+        min-width: 32px;
+        line-height: 1.2;
       }
     }
-    }
+  }
   .youlike {
     margin: 12px 0;
     display: flex;

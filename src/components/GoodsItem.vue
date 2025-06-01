@@ -86,13 +86,13 @@ export default {
 
     .price-sing {
       font-size: 10px;
-      color: #ff0400;
+      color: #ff5000;
       margin-right: 2px;
     }
 
     .price {
       font-size: 16px;
-      color: #e02d29;
+      color: #ff5000;
       font-weight: 700;
 
       span {

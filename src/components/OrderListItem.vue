@@ -6,7 +6,7 @@
       <div class="text status">{{ item.status_text }}</div>
     </div>
     <!-- 商品列表 -->
-    <div class="goods-item-top" v-for="(orders,index) in item" :key="index">
+    <div class="goods-item-top" v-for="(orders,index) in item" :key="index" @click="$router.push(`/prodetail/${orders.goods_id}`)">
       <!-- 图片 -->
       <div class="goods-img">
         <img :src="orders.color_image || orders.goods_coverImg" alt="goods-img" />
