@@ -1,5 +1,10 @@
 <template>
   <div class="add-goods-container">
+    <topTitle>
+      <h3>
+        添加商品
+      </h3>
+    </topTitle>
     <div class="form-card">
       <h1 class="form-title">添加新商品</h1>
       <form @submit.prevent="submitForm" class="goods-form">
@@ -239,8 +244,11 @@
 <script>
 import { mapState } from 'vuex'
 import { submitGoodsServer } from '@/api/goods'
+import topTitle from '@/components/TopTitle.vue'
 export default {
-  components: {},
+  components: {
+    topTitle
+  },
   data () {
     return {
       form: {
@@ -361,9 +369,20 @@ export default {
         })
 
         // 提交请求
-        // await axios.post('/api/goods', formData)
         await submitGoodsServer(formData)
-        // this.$message.success('商品添加成功！')
+        this.$toast.success('商品添加成功！')
+
+        this.form = {
+          title: '',
+          price: null,
+          description: '',
+          specs: [{ name: '', value: '', price: '', stock: '' }],
+          mainImage: null,
+          mainImagePreview: '',
+          detailImages: [],
+          pageImages: [],
+          categoryId: ''
+        }
         // 成功后的清理
         this.cleanupMemory()
       } catch (error) {
@@ -393,6 +412,7 @@ export default {
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   padding: 20px;
   font-family: "Noto Sans SC", sans-serif;
+  margin-top: 40px;
 }
 
 .form-card {
