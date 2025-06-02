@@ -78,7 +78,7 @@
           <span>我的帮助</span>
         </div>
         <div class="service-item" @click="$router.push('/addgoods')">
-          <van-icon name="service" class="iconfont" />
+         <van-icon name="bag" class="iconfont" />
           <span>添加商品</span>
         </div>
         <div class="service-item">
