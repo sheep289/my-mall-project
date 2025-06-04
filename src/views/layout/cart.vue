@@ -115,10 +115,10 @@ export default {
       isEdit: true
     }
   },
-  created () {
+  async created () {
     // 判断是否有token权证，有token权证才渲染购物车
     if (this.getToken) {
-      this.$store.dispatch('cart/getCartListAction')
+      await this.$store.dispatch('cart/getCartListAction')
     }
   },
   computed: {

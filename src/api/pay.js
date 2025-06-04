@@ -22,3 +22,12 @@ export const submitOrder = (mode, obj) => {
     ...obj
   })
 }
+
+// 获取订单信息
+export const getOrderInfo = (orderId) => {
+  return request.get('/my/order/info', {
+    params: {
+      orderId
+    }
+  })
+}

@@ -9,29 +9,38 @@
 
     <div class="main">
       <!-- 订单 -->
-      <OrderListItem :item="filterData[0]" :type="'order-detail'" @cancelSuccess="handleCancelSuccess">
+      <OrderListItem
+        :item="filterData[0]"
+        :type="'order-detail'"
+        @cancelSuccess="handleCancelSuccess"
+      >
         <div class="detail">
           <ul>
             <li>
               <div>应付款</div>
-              <div style="color:black;font-size:16px"><small>￥</small>{{ filterData[0]?.[0]?.total_amount
-}}</div>
+              <div style="color: black; font-size: 16px">
+                <small>￥</small>{{ filterData[0]?.[0]?.total_amount }}
+              </div>
             </li>
             <li>
               <div>订单编号</div>
-              <div>sm1174938475847584 | <span @click="copyText">复制</span></div>
+              <div>
+                {{ orderInfo.order_no}} | <span @click="copyText">复制</span>
+              </div>
             </li>
             <li>
               <div>收货信息</div>
-              <div>李志峰，18888888888，湖南省 长沙市 雨花区 长沙环境保护职业技术学院999999999</div>
+              <div>
+                {{orderInfo.address}}
+              </div>
             </li>
             <li>
               <div>创建时间</div>
-              <div>2025-03-06 01:51:34</div>
+              <div>{{ orderInfo.created_at}}</div>
             </li>
             <li>
               <div>成交时间</div>
-              <div>2025-03-06 01:51:34</div>
+              <div>{{ orderInfo.created_at}}</div>
             </li>
           </ul>
         </div>
@@ -44,6 +53,7 @@
 import OrderListItem from '@/components/OrderListItem.vue'
 import TopTitle from '@/components/TopTitle.vue'
 import { mapState } from 'vuex'
+import { getOrderInfo } from '@/api/pay'
 export default {
   components: {
     OrderListItem,
@@ -51,11 +61,12 @@ export default {
   },
   data () {
     return {
+      orderInfo: {}
     }
   },
   async created () {
     await this.$store.dispatch('order/getOrderList', 'all')
-    await this.test()
+    await this.getOrderInfoData()
   },
   computed: {
     ...mapState('order', ['orderList']),
@@ -71,24 +82,17 @@ export default {
 
   },
   methods: {
-    a () {
-      console.log(1)
-    },
-    test () {
-      // const a = this.orderList.map(item => item.order_id)
-      // const b = this.orderList.filter(item => item.order_id === 86)
-      // console.log(b)
-      // console.log(this.orderId)
-
-      console.log(this.filterData)
+    async getOrderInfoData () {
+      const { data } = await getOrderInfo(this.orderId)
+      this.orderInfo = data
+      this.orderInfo.address = this.orderInfo.address.replace(/\s+/g, ',')
     },
     handleCancelSuccess () {
       this.$router.push('/myorder?type=all')
     },
     async copyText () {
-      const textToCopy = '12839283923829'
       try {
-        await navigator.clipboard.writeText(textToCopy)
+        await navigator.clipboard.writeText(this.orderInfo.order_no)
         this.$toast('复制成功')
       } catch (err) {
         console.error('复制失败', err)
@@ -123,7 +127,7 @@ export default {
             text-align: right;
             line-height: 20px;
 
-            span{
+            span {
               color: black;
               font-size: 13px;
             }
