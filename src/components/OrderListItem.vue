@@ -1,12 +1,12 @@
 <template>
   <div class="order-item">
     <!-- 订单头部 -->
-    <div class="order-top">
-      <div class="text time">{{ item.created_at }}</div>
-      <div class="text status">{{ item.status_text }}</div>
+    <div class="order-top" v-show="type ===  'order'">
+      <div class="text time">{{ item?.created_at || '' }}</div>
+      <div class="text status">{{ item?.status_text || '' }}</div>
     </div>
     <!-- 商品列表 -->
-    <div class="goods-item-top" v-for="(orders,index) in item" :key="index" @click="$router.push(`/prodetail/${orders.goods_id}`)">
+    <div class="goods-item-top" v-for="(orders,index) in item" :key="index" @click="type === 'order' ? $router.push(`/order/detail?orderId=${orders.order_id}`) : $router.push(`/prodetail/${orders.goods_id}`)">
       <!-- 图片 -->
       <div class="goods-img">
         <img :src="orders.color_image || orders.goods_coverImg" alt="goods-img" />
@@ -30,12 +30,12 @@
       </div>
     </div>
 
-    <div class="goods-item-foot">应付款<small>￥</small>{{ item.total_amount }}</div>
+    <div class="goods-item-foot" v-show="type === 'order'">应付款<small>￥</small>{{ item?.total_amount }}</div>
 
-    <div class="btn" v-if="item.status !== 'completed'">
-      <span v-if="item.status !== 'paid' && item.status !== 'shipped'" @click="onDelOrder(item)">删除订单</span>
-      <span v-if="item.status === 'pending' || item.status === 'cancelled'"  class="active" @click="onBuyNow(item)">立即付款</span>
-      <span v-else-if="item.status === 'shipped' || item.status === 'paid'"  class="active" @click="onCancelOrder(item)">申请取消</span>
+    <div class="btn" v-if="item?.status !== 'completed'">
+      <span v-if="item?.status !== 'paid' && item?.status !== 'shipped'" @click="onDelOrder(item)">删除订单</span>
+      <span v-if="item?.status === 'pending' || item?.status === 'cancelled'"  class="active" @click="onBuyNow(item)">立即付款</span>
+      <span v-else-if="item?.status === 'shipped' || item?.status === 'paid'"  class="active" @click="onCancelOrder(item)">申请取消</span>
       <span v-else  class="active">确认收货</span>
     </div>
 
@@ -43,6 +43,8 @@
     <div class="btn" v-else>
       <span  class="active">待评价</span>
     </div>
+
+    <slot></slot>
   </div>
 </template>
 
@@ -52,6 +54,10 @@ export default {
   props: {
     item: {
       type: Array
+    },
+    type: {
+      type: String,
+      default: 'order'
     }
   },
   data () {

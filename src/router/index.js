@@ -13,6 +13,7 @@ import Address from '@/views/address'
 import CreateAddress from '@/views/address/createAddress.vue'
 import Update from '@/views/address/update.vue'
 import AddGoods from '@/views/addGoods'
+import OrderDetail from '@/views/myorder/OrderDetail.vue'
 
 // 二级路由
 import Home from '@/views/layout/home.vue'
@@ -33,8 +34,8 @@ const router = new VueRouter({
       children: [
         { path: '/home', component: Home },
         { path: '/category', component: Category },
-        { path: 'cart', component: Cart },
-        { path: 'user', component: User }
+        { path: '/cart', component: Cart },
+        { path: '/user', component: User }
       ]
     },
     {
@@ -55,7 +56,8 @@ const router = new VueRouter({
     },
     { path: '/create', component: CreateAddress },
     { path: '/update', component: Update },
-    { path: '/addGoods', component: AddGoods }
+    { path: '/addGoods', component: AddGoods },
+    { path: '/order/detail', component: OrderDetail }
   ]
 })
 

@@ -23,6 +23,7 @@
         v-for="(item, index) in orderList"
         :key="index"
         :item="item"
+        :type="'order'"
         @cancelSuccess="handleCancelSuccess"
       ></OrderList>
     </div>
@@ -37,14 +38,12 @@
 <script>
 import TopTitle from '@/components/TopTitle.vue'
 import OrderList from '@/components/OrderListItem.vue'
-import { getOrderList } from '@/api/userInfo'
 import { mapState } from 'vuex'
 export default {
   components: { TopTitle, OrderList },
   data () {
     return {
       activeIndex: 0,
-      orderList: [],
       currentTabType: null, // 记录当前请求类型，防止相同标签重复请求
       isRequesting: false // 状态锁防止快速切换不同标签时的连续请求
     }
@@ -64,6 +63,7 @@ export default {
   },
   computed: {
     ...mapState('user', ['userIndexData']),
+    ...mapState('order', ['orderList']),
     getQueryType () {
       return this.$route.query.type
     }
@@ -88,18 +88,7 @@ export default {
     },
 
     async getData (type) {
-      const { data } = await getOrderList(type)
-      this.orderList = data
-      // 处理回来的数据
-      data.forEach((item) => {
-        item.created_at = item[0]?.created_at
-        item.total_amount = item[0]?.total_amount
-        item.status = item[0]?.status
-        item.status_text = item[0]?.status_text
-        item.forEach(specs => {
-          specs.value = specs?.value.join(' / ')
-        })
-      })
+      await this.$store.dispatch('order/getOrderList', type)
     },
     handleCancelSuccess () {
       // 申请取消成功了 跳转到全部
