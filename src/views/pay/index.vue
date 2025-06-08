@@ -268,8 +268,9 @@ export default {
       this.$router.push({
         path: '/address',
         query: {
-          url: this.$router.currentRoute.fullPath,
-          addressId: this.address ? this.address.user_address_id : ''
+          source: this.$route.fullPath, // 记录真实来源页面
+          addressId: this.address ? this.address.user_address_id : '',
+          fromPage: 'pay'
         }
       })
     },
@@ -314,7 +315,10 @@ export default {
         // 再次调用，更新余额
         await this.getPayModeList()
         this.$toast.success('支付成功')
-        this.$router.replace('/myorder')
+        this.$router.replace({
+          path: '/myorder',
+          meta: { noBack: true }
+        })
       } catch (error) {
         console.log('提交失败', error)
       }

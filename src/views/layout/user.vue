@@ -32,7 +32,7 @@
         <div class="asset-label">账户余额</div>
       </div>
       <div class="asset-item">
-        <div class="asset-value" v-if="token">3 张</div>
+        <div class="asset-value" v-if="token">无</div>
         <div class="asset-value" v-else>无</div>
         <div class="asset-label">优惠券</div>
       </div>
@@ -61,7 +61,7 @@
         <h3>我的服务</h3>
       </div>
       <div class="service-grid">
-        <div class="service-item" @click="$router.push('/address')">
+        <div class="service-item" @click="goAddress">
           <van-icon name="location" class="iconfont" />
           <span>收货地址</span>
         </div>
@@ -123,6 +123,16 @@ export default {
     }
   },
   methods: {
+    goAddress () {
+      this.$router.push({
+        path: '/address',
+        query: {
+          source: this.$route.fullPath, // 记录真实来源
+          fromPage: 'user'
+
+        }
+      })
+    },
     handleLogout () {
       this.$modal.confirm({
         title: '温馨提示',

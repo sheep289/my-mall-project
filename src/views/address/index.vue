@@ -85,12 +85,7 @@ export default {
   },
   methods: {
     addAddress () {
-      this.$router.push({
-        path: '/create',
-        query: {
-          url: this.$router.currentRoute.fullPath
-        }
-      })
+      this.$router.push('/create')
     },
     clearHandle (id) {
       if (!id) return
@@ -108,10 +103,7 @@ export default {
     updateHandle (addressId) {
       this.$router.push({
         path: '/update',
-        query: {
-          url: this.$router.currentRoute.fullPath,
-          addressId
-        }
+        query: { addressId }
       })
     },
     setDefaultAddress (index, addressId) {
@@ -123,15 +115,17 @@ export default {
       this.$store.dispatch('address/setDefaultAddressAction', addressId)
     },
     selectAddress (item, index) {
+      const source = this.$route.query.source
+
       // 如果路由参数不存在，说明不是重其它页面跳转过来的，则无触发该方法，不要做高亮以跳转
-      if (!this.$route.query.url) return
+      if (!source) return
       this.activeIndex = index
       if (!this.timerId) {
         this.timerId = setTimeout(() => {
           this.$router.replace({
-            path: this.$route.query.url,
+            path: source,
             query: {
-              // ...this.$route.query,
+              ...this.$route.query,
               addressId: item.user_address_id
             }
           })

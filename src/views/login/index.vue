@@ -81,6 +81,10 @@ export default {
           */
 
           const url = this.$route.query.url || '/'
+          if (url === '/user') {
+            await this.$store.dispatch('user/getUserData')
+          }
+
           this.$router.replace(url)
         }
       } catch (error) {

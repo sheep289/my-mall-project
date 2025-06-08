@@ -150,11 +150,12 @@ export default {
       if (status === 0) {
         this.$toast.success('添加成功')
         this.timerId = setTimeout(() => {
-          this.$router.replace(this.$route.query.url)
+          this.$router.go(-1)
           this.timerId = null
         }, 1000)
       }
     }
+
   },
   destroyed () {
     // 销毁定时器

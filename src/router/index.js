@@ -44,7 +44,14 @@ const router = new VueRouter({
     },
     { path: '/register', component: Register },
     { path: '/myorder', component: Myorder },
-    { path: '/pay', component: Pay },
+    {
+      path: '/pay',
+      component: Pay,
+      meta: {
+        disableBack: true,
+        isCheckout: true
+      }
+    },
     { path: '/search', component: Search },
     // 问题：如何确认是哪个商品的详情
     // 解决：动态路由传参 确认将来是哪个商品，路由携带参数传参
@@ -52,26 +59,46 @@ const router = new VueRouter({
     { path: '/searchList', component: SearchList },
     {
       path: '/address',
-      component: Address
+      component: Address,
+      meta: { isAddress: true, allowTransition: true }
     },
-    { path: '/create', component: CreateAddress },
-    { path: '/update', component: Update },
+    { path: '/create', component: CreateAddress, meta: { isAddress: true } },
+    { path: '/update', component: Update, meta: { isAddress: true } },
     { path: '/addGoods', component: AddGoods },
     { path: '/order/detail', component: OrderDetail }
   ]
 })
 
-const authUrl = ['/pay', '/myorder', '/address', '/create', '/update']
 // 路由前置守卫
 router.beforeEach((to, from, next) => {
-  // to.path是要去的页面路径
-  // 判断to.path路径否在authUrl中出现 非权限页面直接放行
+  // console.log(`Navigating from ${from.path} to ${to.path}`) // 调试用
+
+  // 1. 允许地址系统内的合法跳转
+  const isAddressSystemToAddressSystem =
+    (from.path === '/address' && (to.path === '/create' || to.path === '/update')) ||
+    (from.path === '/create' && to.path === '/address') ||
+    (from.path === '/update' && to.path === '/address')
+
+  if (isAddressSystemToAddressSystem) {
+    next()
+    return
+  }
+
+  // 2. 阻止循环跳转
+  const isSamePageNavigation = to.path === from.path
+  const isAddressLoop = to.path === '/address' && from.path === '/address'
+
+  if (isSamePageNavigation || isAddressLoop) {
+    next('/home')
+    return
+  }
+
+  const authUrl = ['/pay', '/myorder', '/address', '/create', '/update']
   if (!authUrl.includes(to.path)) {
     next()
     return
   }
 
-  // 需要权限的路径，被拦截下来需要判断是否又token权证
   const token = store.getters.getToken
   if (token) {
     next()
