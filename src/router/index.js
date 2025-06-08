@@ -1,21 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-// 导入所有的一级路由
-import Login from '@/views/login'
-import Layout from '@/views/layout'
-import Myorder from '@/views/myorder'
-import Pay from '@/views/pay'
-import Search from '@/views/search'
-import Prodetail from '@/views/prodetail'
-import SearchList from '@/views/search/list.vue'
-import Register from '@/views/login/register.vue'
-import Address from '@/views/address'
-import CreateAddress from '@/views/address/createAddress.vue'
-import Update from '@/views/address/update.vue'
-import AddGoods from '@/views/addGoods'
-import OrderDetail from '@/views/myorder/OrderDetail.vue'
 
 // 二级路由
+import Layout from '@/views/layout'
 import Home from '@/views/layout/home.vue'
 import Category from '@/views/layout/category.vue'
 import Cart from '@/views/layout/cart.vue'
@@ -23,6 +10,19 @@ import User from '@/views/layout/user.vue'
 
 import store from '@/store'
 Vue.use(VueRouter)
+// 导入所有的一级路由
+const Login = () => import('@/views/login')
+const Myorder = () => import('@/views/myorder')
+const Pay = () => import('@/views/pay')
+const Search = () => import('@/views/search')
+const Prodetail = () => import('@/views/prodetail')
+const SearchList = () => import('@/views/search/list.vue')
+const Register = () => import('@/views/login/register.vue')
+const Address = () => import('@/views/address')
+const CreateAddress = () => import('@/views/address/createAddress.vue')
+const Update = () => import('@/views/address/update.vue')
+const AddGoods = () => import('@/views/addGoods')
+const OrderDetail = () => import('@/views/myorder/OrderDetail.vue')
 
 const router = new VueRouter({
   routes: [
