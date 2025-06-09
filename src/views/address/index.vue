@@ -107,28 +107,20 @@ export default {
       })
     },
     setDefaultAddress (index, addressId) {
-      this.addressList.forEach((item, i) => {
-        // 通过Vue.set确保响应式更新
-        this.$set(item, 'is_default', i === index)
-      })
+      this.$store.commit('address/updateIsDefault', index)
       // 更改后台数据
       this.$store.dispatch('address/setDefaultAddressAction', addressId)
     },
     selectAddress (item, index) {
       const source = this.$route.query.source
 
-      // 如果路由参数不存在，说明不是重其它页面跳转过来的，则无触发该方法，不要做高亮以跳转
-      if (!source) return
+      if (!source || source.split('?')[0] === '/user') return
       this.activeIndex = index
+
       if (!this.timerId) {
         this.timerId = setTimeout(() => {
-          this.$router.replace({
-            path: source,
-            query: {
-              ...this.$route.query,
-              addressId: item.user_address_id
-            }
-          })
+          sessionStorage.setItem('backAddressId', item.user_address_id)
+          this.$router.go(-1)
           this.timerId = null
         }, 300)
       }

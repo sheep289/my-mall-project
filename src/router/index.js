@@ -71,6 +71,10 @@ const router = new VueRouter({
 
 // 路由前置守卫
 router.beforeEach((to, from, next) => {
+  if (from.path === '/pay' && to.path === '/address') {
+    next()
+    return
+  }
   // console.log(`Navigating from ${from.path} to ${to.path}`) // 调试用
 
   // 1. 允许地址系统内的合法跳转

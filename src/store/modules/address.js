@@ -1,4 +1,5 @@
 import { getAddressList, clearAddress, setDefaultAddress } from '@/api/address'
+import Vue from 'vue'
 
 export default {
   namespaced: true,
@@ -10,6 +11,12 @@ export default {
   mutations: {
     setAddressList (state, arr) {
       state.addressList = arr
+    },
+    updateIsDefault (state, index) {
+      state.addressList.forEach((item, i) => {
+        // 通过Vue.set确保响应式更新
+        Vue.set(item, 'is_default', i === index)
+      })
     }
   },
   actions: {

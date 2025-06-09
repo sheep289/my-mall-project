@@ -179,7 +179,8 @@ export default {
       address: {}, // 存储地址
       payModeList: [], // 支付类型数据
       psf: 10, // 配送费
-      remark: '很期待该商品' // 存放留言
+      remark: '很期待该商品', // 存放留言
+      timerId: null
     }
   },
   async created () {
@@ -276,7 +277,7 @@ export default {
     },
     getDefaultAddress () {
       // // 获取addressId
-      const addId = parseInt(this.$route.query.addressId)
+      const addId = sessionStorage.getItem('backAddressId')
 
       //  1.判断addId是否存在，如果不存在，说明用户没有选择其它地址（而是默认地址渲染）
       // 2.如果存在，说明用户选择了新的地址（重address页面跳转过来的），则需要根据携带的addressId查询对应的数据进行渲染
@@ -286,7 +287,7 @@ export default {
         this.address = findData1
       } else {
         // 2.重新选择的地址
-        const findData2 = this.addressList.find(item => item.user_address_id === addId)
+        const findData2 = this.addressList.find(item => item.user_address_id === parseInt(addId))
         this.address = findData2
       }
     },
@@ -314,15 +315,23 @@ export default {
         }
         // 再次调用，更新余额
         await this.getPayModeList()
-        this.$toast.success('支付成功')
-        this.$router.replace({
-          path: '/myorder',
-          meta: { noBack: true }
-        })
+        await this.$toast.success('支付成功')
+        if (!this.timerId) {
+          this.timerId = setTimeout(() => {
+            this.$router.replace({
+              path: '/myorder',
+              meta: { noBack: true }
+            })
+            sessionStorage.removeItem('backAddressId')
+          }, 300)
+        }
       } catch (error) {
         console.log('提交失败', error)
       }
     }
+  },
+  destroyed () {
+    clearTimeout(this.timerId)
   }
 }
 </script>

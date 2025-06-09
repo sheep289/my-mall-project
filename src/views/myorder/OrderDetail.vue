@@ -88,7 +88,7 @@ export default {
       this.orderInfo.address = this.orderInfo.address.replace(/\s+/g, ',')
     },
     handleCancelSuccess () {
-      this.$router.push('/myorder?type=all')
+      this.$router.replace('/myorder?type=all')
     },
     async copyText () {
       try {
