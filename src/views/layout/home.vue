@@ -1,38 +1,41 @@
 <template>
   <div class="home">
-    <!-- 搜索 -->
-    <div class="search">
-      <van-icon name="search" class="icon" />
-      <input
-        type="text"
-        class="inp"
-        placeholder="请搜索你要找的商品"
-        @click="$router.push('/search')"
-      />
-    </div>
-    <!-- 轮播图 -->
-    <Swiper :items="bannerList"></Swiper>
-    <!-- 导航栏 -->
-    <div class="nav-bar">
-      <div class="nav-list" v-for="(item, index) in navbarList" :key="index" @click="$router.push('/category')">
-        <div class="icon-img">
-          <img :src="item.icon_url" alt="icon" />
-        </div>
-        <span>{{ item.name }}</span>
+    <!-- 下拉刷新组件 -->
+    <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
+      <!-- 搜索 -->
+      <div class="search">
+        <van-icon name="search" class="icon" />
+        <input
+          type="text"
+          class="inp"
+          placeholder="请搜索你要找的商品"
+          @click="$router.push('/search')"
+        />
       </div>
-    </div>
-    <!-- 商品卡片 -->
-    <div class="youlike">
-      <p>—— 猜你喜欢 ——</p>
-    </div>
-    <!--  -->
-    <div class="goods-item">
-      <GoodsItem
-        v-for="item in goodsList"
-        :key="item.id"
-        :item="item"
-      ></GoodsItem>
-    </div>
+      <!-- 轮播图 -->
+      <Swiper :items="bannerList"></Swiper>
+      <!-- 导航栏 -->
+      <div class="nav-bar">
+        <div class="nav-list" v-for="(item, index) in navbarList" :key="index" @click="$router.push('/category')">
+          <div class="icon-img">
+            <img :src="item.icon_url" alt="icon" />
+          </div>
+          <span>{{ item.name }}</span>
+        </div>
+      </div>
+      <!-- 商品卡片 -->
+      <div class="youlike">
+        <p>—— 猜你喜欢 ——</p>
+      </div>
+      <!-- 商品列表 -->
+      <div class="goods-item">
+        <GoodsItem
+          v-for="item in goodsList"
+          :key="item.id"
+          :item="item"
+        ></GoodsItem>
+      </div>
+    </van-pull-refresh>
   </div>
 </template>
 
@@ -52,15 +55,34 @@ export default {
       bannerList: [],
       navbarList: [],
       goodsList: [],
-      activeIndex: 0
+      activeIndex: 0,
+      isLoading: false // 控制下拉刷新状态
     }
   },
   async created () {
-    this.bannerData()
-    this.navData()
-    this.goodsData()
+    this.initData()
   },
   methods: {
+    // 初始化数据
+    async initData () {
+      await Promise.all([
+        this.bannerData(),
+        this.navData(),
+        this.goodsData()
+      ])
+    },
+    // 下拉刷新回调
+    async onRefresh () {
+      try {
+        await this.initData()
+        this.$toast('刷新成功')
+      } catch (error) {
+        console.error('刷新失败:', error)
+        this.$toast('刷新失败')
+      } finally {
+        this.isLoading = false
+      }
+    },
     async bannerData () {
       const res = await getBannerData()
       this.bannerList = res.data_url
@@ -74,7 +96,6 @@ export default {
       this.goodsList = res.data
     }
   }
-
 }
 </script>
 
@@ -130,16 +151,16 @@ export default {
     &::-webkit-scrollbar { display: none; } // Chrome
 
     .nav-list {
-      min-width: 60px; // 调小宽度
-      margin: 6px 6px 6px 0; // 缩小间距
-      font-size: 13px; // 缩小字体
+      min-width: 60px;
+      margin: 6px 6px 6px 0;
+      font-size: 13px;
       color: #666;
       display: flex;
       flex-direction: column;
       align-items: center;
 
       .icon-img {
-        width: 32px; // 缩小图标
+        width: 32px;
         height: 32px;
         margin-bottom: 2px;
 
